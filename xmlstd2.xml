@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UT-8"?>
+
+<!DOCTYPE aliens SYSTEM "xmlstd3.dtd">
+<aliens>
+	<alien aid="A2" lang="Java">
+		<name>jacob</name>
+		<salary>100020</salary>
+	</alien>
+	<alien aid='A1' lang="Python">
+		<name>sgsf</name>
+		<salary>1345000</salary>
+	</alien>
+</aliens>
+
+
+
+
+{ "emp": {
+	"id":"1"
+	"name": "jacob"
+	}
+	{
+	"id":"101"
+	"name": "smithb"
+	}
+}
